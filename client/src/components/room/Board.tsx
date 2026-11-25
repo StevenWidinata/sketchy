@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { BRUSH_SIZES, CANVAS, LIMITS, PALETTE } from "../../../../shared/constants";
+import { BRUSH_SIZES, CANVAS, PALETTE } from "../../../../shared/constants";
 import type { DrawAction, Tool } from "../../../../shared/types";
 import { applyAction, drawStroke, newId, renderAll } from "../../lib/drawing";
-import { socket } from "../../lib/socket";
+import { draw } from "../../lib/net";
 import { drawing } from "../../lib/store";
 import { Icon } from "../Icon";
 
@@ -45,7 +45,6 @@ export function Board({ canDraw, label }: { canDraw: boolean; label: string }) {
     const canvas = canvasRef.current;
     if (!canvas || !canDraw) return;
     let active: Extract<DrawAction, { kind: "stroke" }> | null = null;
-    let pending: number[] = [];
     let lastX = 0;
     let lastY = 0;
     let rect = canvas.getBoundingClientRect();
@@ -55,14 +54,6 @@ export function Board({ canDraw, label }: { canDraw: boolean; label: string }) {
       Math.round(((e.clientY - rect.top) / rect.height) * CANVAS.height),
     ];
 
-    const flush = () => {
-      if (!active || !pending.length) return;
-      for (let i = 0; i < pending.length; i += LIMITS.pointsPerMessage) {
-        socket.emit("draw:points", { id: active.id, points: pending.slice(i, i + LIMITS.pointsPerMessage) });
-      }
-      pending = [];
-    };
-    const timer = setInterval(flush, 40);
 
     const down = (e: PointerEvent) => {
       if (e.button !== 0 && e.pointerType === "mouse") return;
@@ -71,16 +62,14 @@ export function Board({ canDraw, label }: { canDraw: boolean; label: string }) {
       const { tool: t, color: c, size: s } = settings.current;
       if (t === "fill") {
         const action = { kind: "fill" as const, id: newId(), x: Math.min(CANVAS.width - 1, x), y: Math.min(CANVAS.height - 1, y), color: c };
-        drawing.push(action);
-        socket.emit("draw:fill", action);
+        draw.fill(action);
         return;
       }
       canvas.setPointerCapture(e.pointerId);
       active = { kind: "stroke", id: newId(), color: c, size: s, tool: t, points: [x, y] };
       lastX = x;
       lastY = y;
-      drawing.push(active);
-      socket.emit("draw:begin", { ...active, points: [x, y] });
+      draw.begin(active);
     };
 
     const move = (e: PointerEvent) => {
@@ -96,12 +85,11 @@ export function Board({ canDraw, label }: { canDraw: boolean; label: string }) {
         lastY = y;
       }
       if (!added.length) return;
-      drawing.append(active.id, added);
-      pending.push(...added);
+      draw.points(active.id, added);
     };
 
     const up = () => {
-      flush();
+      draw.flush();
       active = null;
     };
 
@@ -125,8 +113,7 @@ export function Board({ canDraw, label }: { canDraw: boolean; label: string }) {
     canvas.addEventListener("pointercancel", up);
     canvas.addEventListener("pointerleave", hideCursor);
     return () => {
-      flush();
-      clearInterval(timer);
+      draw.flush();
       canvas.removeEventListener("pointerdown", down);
       canvas.removeEventListener("pointermove", move);
       canvas.removeEventListener("pointerup", up);
@@ -135,17 +122,9 @@ export function Board({ canDraw, label }: { canDraw: boolean; label: string }) {
     };
   }, [canDraw]);
 
-  const undo = () => {
-    if (!drawing.actions.length) return;
-    drawing.undo();
-    socket.emit("draw:undo");
-  };
+  const undo = () => draw.undo();
 
-  const clear = () => {
-    const action = { kind: "clear" as const, id: newId() };
-    drawing.push(action);
-    socket.emit("draw:clear", action);
-  };
+  const clear = () => draw.clear({ kind: "clear", id: newId() });
 
   // Keyboard shortcuts for the drawer.
   useEffect(() => {

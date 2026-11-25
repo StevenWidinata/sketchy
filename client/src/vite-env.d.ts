@@ -1,8 +1,9 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  /** Game server URL, e.g. https://sketchy.onrender.com. Empty = same origin. */
-  readonly VITE_SERVER_URL?: string;
+  readonly VITE_SUPABASE_URL?: string;
+  /** Supabase publishable (or legacy anon) key. Safe for the browser; RLS protects the data. */
+  readonly VITE_SUPABASE_PUBLISHABLE_KEY?: string;
 }
 
 interface ImportMeta {

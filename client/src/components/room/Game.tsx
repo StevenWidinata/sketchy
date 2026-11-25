@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { RoomState, WordChoice } from "../../../../shared/types";
 import { categoryName } from "../../../../shared/words";
 import { burst } from "../../lib/confetti";
-import { socket } from "../../lib/socket";
+import { chooseWord, react as sendReaction } from "../../lib/net";
 import { useGame } from "../../lib/store";
 import { Icon } from "../Icon";
 import { Raccoon, type RaccoonMood } from "../Raccoon";
@@ -123,7 +123,7 @@ function Overlay({ room, you, choices, isDrawer }: { room: RoomState; you: strin
             <ul className="picker-list">
               {choices.map((c, i) => (
                 <li key={c.word} style={{ animationDelay: `${i * 90}ms` }}>
-                  <button type="button" className="pick" onClick={() => socket.emit("turn:choose", i)}>
+                  <button type="button" className="pick" onClick={() => void chooseWord(i)}>
                     <span className="pick-cat">{categoryName(c.categoryId, lang)}</span>
                     <span className="pick-word">{c.word}</span>
                   </button>
@@ -199,7 +199,7 @@ function Reactions({ room }: { room: RoomState }) {
   useEffect(() => setMine(null), [room.drawerId, room.round]);
   const react = (kind: "like" | "dislike") => {
     setMine(kind);
-    socket.emit("turn:react", kind);
+    void sendReaction(kind);
   };
   return (
     <div className="reactions" role="group" aria-label="Rate this drawing">

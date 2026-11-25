@@ -12,48 +12,54 @@ A free, realtime multiplayer drawing and guessing game. One player draws a word,
 
 ## Run it locally
 
-Needs Node 22 or newer.
+Needs Node 22 or newer and the Vercel CLI, linked to the project (`vercel link`).
 
 ```bash
 npm install
+vercel env pull .env.local   # Supabase URL and keys
 npm run dev
 ```
 
-Open http://localhost:5173 in two browser windows (or a phone on the same network with `npx vite --host`) to play against yourself.
+Open http://localhost:5173 in two browser windows to play against yourself. Each tab is its own player.
 
 ## Scripts
 
 | Command | What it does |
 | --- | --- |
-| `npm run dev` | Game server on :3001 and the Vite dev server on :5173 |
+| `npm run dev` | The website and the `/api/game` function together on :5173, like on Vercel |
 | `npm run build` | Builds the website into `dist` |
-| `npm start` | Runs the server, which also serves the built website |
+| `npm run db:apply` | Runs any new files in `supabase/migrations` against the database |
 | `npm test` | Unit tests for guessing, scoring, hints and the turn state machine |
-| `npm run e2e` | Two browsers play a real round (uses your installed Chrome) |
+| `npm run e2e` | Two browsers play a real round against the dev server (uses your installed Chrome) |
 | `npm run typecheck` | TypeScript check for client, server and shared code |
 
 ## Deploy
 
-The live setup is two services that both redeploy on every push to `main`:
+Everything runs on free plans and redeploys on every push to `main`:
 
-| Part | Host | Config |
-| --- | --- | --- |
-| Website | Vercel (connected to this GitHub repo) | `vercel.json`, env `VITE_SERVER_URL` = the game server URL |
-| Game server | Render free web service | `render.yaml`, env `CLIENT_URL` = the website URL |
+| Part | Host |
+| --- | --- |
+| Website and the `/api/game` function | Vercel, region Singapore (`vercel.json`) |
+| Database, anonymous player accounts and realtime messages | Supabase free project, added through the Vercel Marketplace, region Singapore |
 
-The game server stays on a normal long-running host because rooms, timers and scores live in its memory and every player holds a WebSocket open. Vercel Functions don't route players of one room to the same instance and close connections at their time limit, so the server would need Redis to run there.
+The Supabase keys reach Vercel through the Marketplace integration. The browser only gets `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`; the secret key stays on the server.
 
-Render's free plan sleeps after about 15 minutes without players, so the first visit after a quiet spell waits up to a minute while it wakes.
+Supabase settings that the game depends on (Dashboard):
 
-To host everything on one Node server instead, run `npm ci && npm run build`, then `npm start` with `NODE_ENV=production`; the server then serves the website too.
+- Authentication, Sign In / Providers: **Allow anonymous sign-ins** on.
+- Realtime, Settings: **Allow public access** off, so only the database policies decide who hears a room.
+
+A free Supabase project pauses after a week with no activity. Restore it from the Supabase dashboard if the game stops loading after a long break.
 
 ## How it works
 
-- `client/` React + TypeScript (Vite). Plain CSS with design tokens, a hand-built SVG raccoon, and a canvas drawn at a fixed 1200 x 900 size on every device so fills replay identically.
-- `server/` Express + Socket.IO. The server owns every timer, word and score; guessers never receive the word. All messages are validated with zod and rate limited.
+- `client/` React + TypeScript (Vite). Plain CSS with design tokens, a hand-built SVG raccoon, and a canvas drawn at a fixed 1200 x 900 size on every device so fills replay identically. Each tab signs in to Supabase anonymously.
+- `api/game.ts` One Vercel Function for every game action. It checks the player's token, loads the room from Postgres with a row lock, runs the game engine, saves the room and sends the result to the room's private Realtime channels. All requests are validated with zod and rate limited.
+- `server/src/game/engine.ts` The game rules as a pure state machine. Timers are deadlines stored in the room, so whichever request comes next moves the game on.
+- `supabase/migrations/` The tables and Realtime policies. Guessers never receive the word: only players in a room hear its channel, and only the current drawer can send strokes.
 - `shared/` Message types, limits and the word lists, used by both sides.
 
-Game state lives in memory per room. Nothing is stored after a room empties.
+Rooms are deleted when the last player leaves, and any room untouched for 6 hours is removed.
 
 ## License
 

@@ -6,7 +6,8 @@ import { Game } from "../components/room/Game";
 import { Lobby } from "../components/room/Lobby";
 import { Podium } from "../components/room/Podium";
 import { loadProfile } from "../lib/profile";
-import { joinRoom, leaveRoom, useGame } from "../lib/store";
+import { joinRoom, leaveRoom } from "../lib/net";
+import { useGame } from "../lib/store";
 import "../styles/room.css";
 
 type Status = { kind: "joining" } | { kind: "gate" } | { kind: "error"; message: string } | { kind: "ready" };
@@ -68,6 +69,33 @@ export function RoomPage({ code, navigate }: { code: string; navigate: (path: st
               </a>
             </>
           )}
+        </main>
+      </div>
+    );
+  }
+
+  if (status.kind === "ready" && !room) {
+    return (
+      <div className="gate">
+        <main className="gate-main">
+          <Raccoon mood="sad" size={150} />
+          <h1 className="gate-title">You're no longer in room {code}</h1>
+          <p className="gate-sub">You may have been away too long, or the room closed.</p>
+          <div className="gate-actions">
+            <button
+              type="button"
+              className="btn btn-primary btn-lg"
+              onClick={() => {
+                started.current = false;
+                setStatus({ kind: "joining" });
+              }}
+            >
+              Join again
+            </button>
+            <a href="/" className="btn btn-secondary btn-lg" onClick={(e) => (e.preventDefault(), navigate("/"))}>
+              Back to home
+            </a>
+          </div>
         </main>
       </div>
     );

@@ -1,5 +1,5 @@
-import { CATEGORIES } from "../../../shared/words";
-import type { Settings, WordChoice } from "../../../shared/types";
+import { CATEGORIES } from "../../../shared/words.js";
+import type { Settings, WordChoice } from "../../../shared/types.js";
 
 export function buildPool(settings: Settings): WordChoice[] {
   const custom = settings.customWords.map((word) => ({ word, categoryId: "custom" }));
@@ -28,14 +28,13 @@ export function pickChoices(
     used.clear();
     fresh = pool;
   }
+  // Partial Fisher-Yates shuffle over unique words: always returns `count` distinct picks when available.
+  const unique = [...new Map(fresh.map((w) => [w.word, w])).values()];
   const picks: WordChoice[] = [];
-  const taken = new Set<string>();
-  let guard = 0;
-  while (picks.length < count && guard++ < 1000 && taken.size < fresh.length) {
-    const w = fresh[Math.floor(rng() * fresh.length)];
-    if (taken.has(w.word)) continue;
-    taken.add(w.word);
-    picks.push(w);
+  for (let i = 0; i < Math.min(count, unique.length); i++) {
+    const j = i + Math.floor(rng() * (unique.length - i));
+    [unique[i], unique[j]] = [unique[j], unique[i]];
+    picks.push(unique[i]);
   }
   return picks;
 }

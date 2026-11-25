@@ -2,7 +2,7 @@ import { useEffect, useId, useState } from "react";
 import { LIMITS, SETTING_OPTIONS } from "../../../../shared/constants";
 import type { Settings } from "../../../../shared/types";
 import { CATEGORIES } from "../../../../shared/words";
-import { socket } from "../../lib/socket";
+import { startGame, updateSettings } from "../../lib/net";
 import { toast, useGame } from "../../lib/store";
 import { Icon } from "../Icon";
 import { Raccoon } from "../Raccoon";
@@ -10,7 +10,7 @@ import { PlayerList } from "./PlayerList";
 import { RoomHeader } from "./RoomHeader";
 import { Segmented } from "./Segmented";
 
-const update = (patch: Partial<Settings>) => socket.emit("room:settings", patch);
+const update = (patch: Partial<Settings>) => void updateSettings(patch);
 
 export function Lobby({ onLeave }: { onLeave: () => void }) {
   const room = useGame((s) => s.room)!;
@@ -194,7 +194,7 @@ export function Lobby({ onLeave }: { onLeave: () => void }) {
             <p className="lobby-foot-note" aria-live="polite">
               {notReady ?? `${connected} players ready`}
             </p>
-            <button type="button" className="btn btn-primary btn-lg" disabled={!!notReady} onClick={() => socket.emit("game:start")}>
+            <button type="button" className="btn btn-primary btn-lg" disabled={!!notReady} onClick={() => void startGame()}>
               Start game
             </button>
           </>

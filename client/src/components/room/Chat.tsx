@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "react";
 import { LIMITS } from "../../../../shared/constants";
-import { socket } from "../../lib/socket";
+import { sendChat } from "../../lib/net";
 import { useGame } from "../../lib/store";
 import { Icon } from "../Icon";
 
@@ -29,7 +29,7 @@ export function Chat({ placeholder, compact }: { placeholder: string; compact?: 
     e.preventDefault();
     const t = text.trim();
     if (!t) return;
-    socket.emit("chat:send", t);
+    void sendChat(t);
     setText("");
     stick.current = true;
   };

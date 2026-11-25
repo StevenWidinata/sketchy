@@ -2,7 +2,7 @@ import { useId, useState, type FormEvent } from "react";
 import { AVATAR_COLORS, LIMITS } from "../../../shared/constants";
 import { loadProfile, saveProfile } from "../lib/profile";
 import { unlockAudio } from "../lib/sound";
-import { createRoom, joinRoom } from "../lib/store";
+import { createRoom, joinRoom } from "../lib/net";
 
 interface Props {
   navigate: (path: string) => void;

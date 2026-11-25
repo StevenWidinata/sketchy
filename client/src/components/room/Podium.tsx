@@ -4,7 +4,7 @@ import type { GalleryItem } from "../../../../shared/types";
 import { categoryName } from "../../../../shared/words";
 import { burst } from "../../lib/confetti";
 import { renderAll, renderUpTo, timelineLength } from "../../lib/drawing";
-import { socket } from "../../lib/socket";
+import { playAgain } from "../../lib/net";
 import { useGame } from "../../lib/store";
 import { Icon } from "../Icon";
 import { Raccoon } from "../Raccoon";
@@ -78,7 +78,7 @@ export function Podium({ onLeave }: { onLeave: () => void }) {
 
           <div className="podium-actions">
             {isHost ? (
-              <button type="button" className="btn btn-primary btn-lg" onClick={() => socket.emit("game:again")}>
+              <button type="button" className="btn btn-primary btn-lg" onClick={() => void playAgain()}>
                 Play again
               </button>
             ) : (

@@ -1,4 +1,4 @@
-import { LIMITS, SCORING } from "../../../shared/constants";
+import { LIMITS, SCORING } from "../../../shared/constants.js";
 
 /** Lowercase, strip accents and punctuation, treat hyphens as spaces, collapse whitespace. */
 export function normalize(text: string): string {

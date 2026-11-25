@@ -138,6 +138,13 @@
   margin-bottom: var(--space-4);
 }
 
+.gate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
 .gate-panel {
   width: min(100%, 420px);
   text-align: left;

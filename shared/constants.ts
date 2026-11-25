@@ -7,7 +7,7 @@ export const LIMITS = {
   playersMin: 2,
   playersMax: 20,
   /** Max number of point coordinates (x and y count separately) stored per turn. */
-  pointsPerTurn: 120_000,
+  pointsPerTurn: 60_000,
   /** Max coordinates in a single draw message. */
   pointsPerMessage: 400,
   actionsPerTurn: 3_000,

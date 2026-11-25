@@ -1,16 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": [
+    "sin1"
+  ],
+  "functions": {
+    "api/game.ts": {
+      "maxDuration": 15
+    }
+  },
   "rewrites": [
     {
       "source": "/r/:code",
       "destination": "/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": {
-        "type": "service",
-        "service": "sketchy"
-      }
     }
   ],
   "headers": [
@@ -19,7 +20,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.onrender.com wss://*.onrender.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
         },
         {
           "key": "X-Content-Type-Options",
@@ -44,12 +45,5 @@
         }
       ]
     }
-  ],
-  "services": {
-    "sketchy": {
-      "root": ".",
-      "framework": "vite",
-      "buildCommand": "npm ci && npm run build"
-    }
-  }
+  ]
 }

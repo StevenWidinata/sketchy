@@ -34,6 +34,10 @@ export interface WordHint {
 
 export interface RoomState {
   code: string;
+  /** Increases with every saved change; clients ignore older states. */
+  rev: number;
+  /** Increases every turn; realtime channel names include it. */
+  turnId: number;
   phase: Phase;
   settings: Settings;
   players: PublicPlayer[];
@@ -43,6 +47,8 @@ export interface RoomState {
   /** Epoch ms at which the current phase ends; null in lobby/podium. */
   phaseEndsAt: number | null;
   phaseDuration: number;
+  /** When hint letters are revealed (epoch ms), so clients can ask for the update on time. */
+  hintTimes: number[];
   /** Server clock when this state was sent, so clients can correct for clock skew. */
   serverNow: number;
   hint: WordHint | null;
@@ -85,44 +91,45 @@ export interface GalleryItem {
   actions: DrawAction[];
 }
 
-export interface ServerToClient {
-  "room:state": (state: RoomState) => void;
-  "room:you": (you: { playerId: string }) => void;
-  "room:error": (error: { message: string }) => void;
-  "turn:choices": (choices: WordChoice[]) => void;
-  "turn:word": (word: { word: string; categoryId: string }) => void;
-  "chat:line": (line: ChatLine) => void;
-  "draw:sync": (actions: DrawAction[]) => void;
-  "draw:begin": (action: Extract<DrawAction, { kind: "stroke" }>) => void;
-  "draw:points": (data: { id: string; points: number[] }) => void;
-  "draw:fill": (action: Extract<DrawAction, { kind: "fill" }>) => void;
-  "draw:clear": (action: Extract<DrawAction, { kind: "clear" }>) => void;
-  "draw:undo": () => void;
-  "game:gallery": (items: GalleryItem[]) => void;
+export type StrokeAction = Extract<DrawAction, { kind: "stroke" }>;
+
+/** Live drawing events, sent by the drawer straight to other players over Supabase Realtime. */
+export type DrawEvent =
+  | { t: "begin"; action: StrokeAction }
+  | { t: "points"; id: string; points: number[] }
+  | { t: "fill"; action: Extract<DrawAction, { kind: "fill" }> }
+  | { t: "clear"; action: Extract<DrawAction, { kind: "clear" }> }
+  | { t: "undo" };
+
+/** Requests to POST /api/game. Every request carries the player's Supabase access token. */
+export type ApiRequest =
+  | { action: "create"; name: string; color: string }
+  | { action: "join"; code: string; name: string; color: string }
+  | { action: "sync"; code: string }
+  | { action: "leave"; code: string }
+  | { action: "settings"; code: string; settings: Partial<Settings> }
+  | { action: "start"; code: string }
+  | { action: "again"; code: string }
+  | { action: "choose"; code: string; index: number }
+  | { action: "chat"; code: string; text: string }
+  | { action: "react"; code: string; kind: "like" | "dislike" }
+  | { action: "drawing"; code: string }
+  | { action: "drawSync"; code: string; turnId: number; keep: number; append: DrawAction[] }
+  | { action: "gallery"; code: string };
+
+export interface PrivateView {
+  choices?: WordChoice[];
+  word?: WordChoice;
 }
 
-export interface JoinPayload {
-  code?: string;
-  name: string;
-  color: string;
-  sessionId: string;
-}
-
-export type Ack = (result: { ok: true; code: string } | { ok: false; message: string }) => void;
-
-export interface ClientToServer {
-  "room:create": (payload: JoinPayload, ack: Ack) => void;
-  "room:join": (payload: JoinPayload, ack: Ack) => void;
-  "room:leave": () => void;
-  "room:settings": (settings: Partial<Settings>) => void;
-  "game:start": () => void;
-  "game:again": () => void;
-  "turn:choose": (index: number) => void;
-  "chat:send": (text: string) => void;
-  "draw:begin": (action: Extract<DrawAction, { kind: "stroke" }>) => void;
-  "draw:points": (data: { id: string; points: number[] }) => void;
-  "draw:fill": (action: Extract<DrawAction, { kind: "fill" }>) => void;
-  "draw:clear": (action: Extract<DrawAction, { kind: "clear" }>) => void;
-  "draw:undo": () => void;
-  "turn:react": (kind: "like" | "dislike") => void;
-}
+export type ApiResponse =
+  | {
+      ok: true;
+      state?: RoomState;
+      you?: string;
+      private?: PrivateView;
+      lines?: ChatLine[];
+      actions?: DrawAction[];
+      gallery?: GalleryItem[];
+    }
+  | { ok: false; message: string };
