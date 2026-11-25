@@ -24,7 +24,7 @@ import {
 const PORT = Number(process.env.PORT ?? 3001);
 const isProd = process.env.NODE_ENV === "production";
 const here = path.dirname(fileURLToPath(import.meta.url));
-const clientDir = path.resolve(here, "../../dist/client");
+const clientDir = path.resolve(here, "../../dist");
 
 const app = express();
 app.disable("x-powered-by");
@@ -50,9 +50,45 @@ app.get("/healthz", (_req, res) => {
   res.json({ ok: true, rooms: rooms.count });
 });
 
+/** Where the website lives when it is hosted separately (Vercel). Server-controlled config. */
+const CLIENT_URL = process.env.CLIENT_URL?.replace(/\/+$/, "");
+
 if (existsSync(clientDir)) {
   app.use(express.static(clientDir, { index: false, maxAge: "1h" }));
   app.get(["/", "/r/:code"], (_req, res) => res.sendFile(path.join(clientDir, "index.html")));
+} else if (CLIENT_URL) {
+  // Someone opened the game server's own address: send them to the website.
+  app.get("/", (_req, res) => res.redirect(302, CLIENT_URL));
+  app.get("/r/:code", (req, res) => {
+    const code = /^[A-Za-z]{5}$/.test(req.params.code) ? `/r/${req.params.code.toUpperCase()}` : "";
+    res.redirect(302, `${CLIENT_URL}${code}`);
+  });
+}
+
+/**
+ * Browser origins allowed to connect. CLIENT_ORIGINS is a comma-separated list
+ * (e.g. https://sketchy.vercel.app). Same-origin and local dev are always allowed.
+ */
+const allowedOrigins = new Set(
+  [
+    ...(process.env.CLIENT_ORIGINS ?? "").split(","),
+    CLIENT_URL ?? "",
+    ...(isProd ? [] : ["http://localhost:5173", "http://127.0.0.1:5173"]),
+  ]
+    .map((o) => o.trim().replace(/\/+$/, ""))
+    .filter(Boolean),
+);
+/** Optional regex for Vercel preview deployments, e.g. ^https://sketchy-[a-z0-9-]+-myteam\.vercel\.app$ */
+const previewOrigin = process.env.CLIENT_ORIGIN_PATTERN ? new RegExp(process.env.CLIENT_ORIGIN_PATTERN) : null;
+
+function originAllowed(origin: string | undefined, host: string | undefined): boolean {
+  if (!origin) return true; // non-browser clients and same-origin polling requests
+  if (allowedOrigins.has(origin) || previewOrigin?.test(origin)) return true;
+  try {
+    return new URL(origin).host === host; // the server's own website (single-service deploy)
+  } catch {
+    return false;
+  }
 }
 
 const httpServer = createServer(app);
@@ -60,7 +96,9 @@ const httpServer = createServer(app);
 type Io = Server<ClientToServer, ServerToClient>;
 const io: Io = new Server(httpServer, {
   maxHttpBufferSize: 64 * 1024,
-  cors: isProd ? undefined : { origin: ["http://localhost:5173"] },
+  cors: { origin: (origin, cb) => cb(null, !origin || allowedOrigins.has(origin) || !!previewOrigin?.test(origin)) },
+  // WebSocket upgrades skip CORS in browsers, so check the Origin header here too.
+  allowRequest: (req, cb) => cb(null, originAllowed(req.headers.origin, req.headers.host)),
   pingInterval: 20_000,
   pingTimeout: 20_000,
 });

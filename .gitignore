@@ -8,3 +8,4 @@ playwright-report/
 shots/
 *.log
 .DS_Store
+.vercel/

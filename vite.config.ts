@@ -6,7 +6,7 @@ const SERVER_PORT = Number(process.env.PORT ?? 3001);
 export default defineConfig({
   root: "client",
   plugins: [react()],
-  build: { outDir: "../dist/client", emptyOutDir: true },
+  build: { outDir: "../dist", emptyOutDir: true },
   server: {
     port: 5173,
     proxy: {

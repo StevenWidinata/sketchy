@@ -26,7 +26,7 @@ Open http://localhost:5173 in two browser windows (or a phone on the same networ
 | Command | What it does |
 | --- | --- |
 | `npm run dev` | Game server on :3001 and the Vite dev server on :5173 |
-| `npm run build` | Builds the website into `dist/client` |
+| `npm run build` | Builds the website into `dist` |
 | `npm start` | Runs the server, which also serves the built website |
 | `npm test` | Unit tests for guessing, scoring, hints and the turn state machine |
 | `npm run e2e` | Two browsers play a real round (uses your installed Chrome) |
@@ -34,9 +34,18 @@ Open http://localhost:5173 in two browser windows (or a phone on the same networ
 
 ## Deploy
 
-The repo includes `render.yaml`. In Render, choose **New > Blueprint**, pick this repository, and it creates one web service that builds the site and runs the game server. The free plan sleeps after about 15 minutes without visitors, so the first visit after a quiet spell takes up to a minute to wake.
+The live setup is two services that both redeploy on every push to `main`:
 
-Any Node host that keeps a long-running process and supports WebSockets works the same way: `npm ci && npm run build`, then `npm start` with `NODE_ENV=production`.
+| Part | Host | Config |
+| --- | --- | --- |
+| Website | Vercel (connected to this GitHub repo) | `vercel.json`, env `VITE_SERVER_URL` = the game server URL |
+| Game server | Render free web service | `render.yaml`, env `CLIENT_URL` = the website URL |
+
+The game server stays on a normal long-running host because rooms, timers and scores live in its memory and every player holds a WebSocket open. Vercel Functions don't route players of one room to the same instance and close connections at their time limit, so the server would need Redis to run there.
+
+Render's free plan sleeps after about 15 minutes without players, so the first visit after a quiet spell waits up to a minute while it wakes.
+
+To host everything on one Node server instead, run `npm ci && npm run build`, then `npm start` with `NODE_ENV=production`; the server then serves the website too.
 
 ## How it works
 
