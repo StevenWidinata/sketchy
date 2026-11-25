@@ -1,0 +1,270 @@
+.rc {
+  --px: 0px;
+  --py: 0px;
+  --hr: 0deg;
+  overflow: visible;
+  display: block;
+}
+
+.rc g,
+.rc path {
+  transform-box: fill-box;
+}
+
+.rc-all {
+  transform-origin: 50% 100%;
+}
+
+.rc-head {
+  transform-origin: 50% 95%;
+  transform: rotate(var(--hr));
+  transition: transform 260ms var(--ease, ease);
+}
+
+.rc-pupils {
+  transform: translate(var(--px), var(--py));
+  transition: transform 140ms var(--ease, ease);
+}
+
+.rc-eyes {
+  transform-origin: center;
+  animation: rc-blink 4.6s infinite;
+}
+
+.rc-tail {
+  transform-origin: 0% 100%;
+  animation: rc-tail 2.6s ease-in-out infinite alternate;
+}
+
+.rc-ear-r {
+  transform-origin: 30% 100%;
+  animation: rc-ear 5.5s ease-in-out infinite;
+}
+
+.rc-ear-l {
+  transform-origin: 70% 100%;
+  animation: rc-ear-l 7s ease-in-out infinite;
+}
+
+.rc-body {
+  transform-origin: 50% 100%;
+  animation: rc-breathe 3.2s ease-in-out infinite;
+}
+
+.rc-arm-r {
+  transform-origin: 8% 8%;
+  transition: transform 300ms var(--ease, ease);
+}
+
+.rc-arm-l {
+  transform-origin: 70% 6%;
+  transition: transform 300ms var(--ease, ease);
+}
+
+.rc-mouth-open,
+.rc-mouth-sad,
+.rc-sweat {
+  display: none;
+}
+
+.rc-scribble {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+/* idle: scribbling with the pencil */
+.rc--idle .rc-arm-r {
+  animation: rc-scribble 0.42s ease-in-out infinite alternate;
+}
+
+.rc--idle .rc-scribble {
+  animation: rc-draw 2.8s linear infinite;
+}
+
+/* think: pencil tapping the chin, eyes up */
+.rc--think .rc-arm-r {
+  animation: rc-tap 0.9s ease-in-out infinite alternate;
+}
+
+.rc--think .rc-pupils {
+  transform: translate(-2px, -4px);
+}
+
+.rc--think .rc-head {
+  transform: rotate(-7deg);
+}
+
+/* cheer: jump with both arms up */
+.rc--cheer .rc-all {
+  animation: rc-jump 0.5s var(--ease, ease) 3;
+}
+
+.rc--cheer .rc-arm-l {
+  transform: rotate(130deg);
+}
+
+.rc--cheer .rc-arm-r {
+  transform: rotate(-30deg) translateY(-6px);
+}
+
+.rc--cheer .rc-mouth-calm,
+.rc--dance .rc-mouth-calm {
+  display: none;
+}
+
+.rc--cheer .rc-mouth-open,
+.rc--dance .rc-mouth-open {
+  display: inline;
+}
+
+/* panic: sweating, shaking, small pupils */
+.rc--panic .rc-sweat {
+  display: inline;
+  animation: rc-drip 1.2s ease-in infinite;
+}
+
+.rc--panic .rc-all {
+  animation: rc-shiver 0.12s linear infinite;
+}
+
+.rc--panic .rc-pupils {
+  transform: translate(var(--px), var(--py)) scale(0.7);
+  transform-origin: center;
+}
+
+.rc--panic .rc-arm-r {
+  animation: rc-scribble 0.16s linear infinite alternate;
+}
+
+/* dance: sway side to side, arms pumping */
+.rc--dance .rc-all {
+  animation: rc-sway 0.7s ease-in-out infinite alternate;
+}
+
+.rc--dance .rc-arm-l {
+  animation: rc-pump-l 0.7s ease-in-out infinite alternate;
+}
+
+.rc--dance .rc-arm-r {
+  animation: rc-pump-r 0.7s ease-in-out infinite alternate;
+}
+
+/* wave: left paw waving */
+.rc--wave .rc-arm-l {
+  animation: rc-wave 0.5s ease-in-out infinite alternate;
+}
+
+/* sad: droopy */
+.rc--sad .rc-mouth-calm {
+  display: none;
+}
+
+.rc--sad .rc-mouth-sad {
+  display: inline;
+}
+
+.rc--sad .rc-head {
+  transform: rotate(4deg) translateY(4px);
+}
+
+.rc--sad .rc-ear-l,
+.rc--sad .rc-ear-r {
+  animation: none;
+  transform: rotate(-14deg);
+}
+
+.rc--sad .rc-tail {
+  animation: none;
+  transform: rotate(14deg);
+}
+
+@keyframes rc-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.08); }
+}
+
+@keyframes rc-tail {
+  from { transform: rotate(-7deg); }
+  to { transform: rotate(9deg); }
+}
+
+@keyframes rc-ear {
+  0%, 64%, 76%, 100% { transform: rotate(0); }
+  68% { transform: rotate(14deg); }
+  72% { transform: rotate(-4deg); }
+}
+
+@keyframes rc-ear-l {
+  0%, 80%, 90%, 100% { transform: rotate(0); }
+  84% { transform: rotate(-12deg); }
+}
+
+@keyframes rc-breathe {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.025); }
+}
+
+@keyframes rc-scribble {
+  from { transform: rotate(-3deg) translate(-1px, 0); }
+  to { transform: rotate(4deg) translate(2px, 1px); }
+}
+
+@keyframes rc-draw {
+  0% { stroke-dashoffset: 1; opacity: 1; }
+  55% { stroke-dashoffset: 0; opacity: 1; }
+  85% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes rc-tap {
+  from { transform: rotate(-62deg); }
+  to { transform: rotate(-70deg); }
+}
+
+@keyframes rc-jump {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  20% { transform: translateY(0) scaleY(0.94); }
+  55% { transform: translateY(-16px) scaleY(1.03); }
+}
+
+@keyframes rc-shiver {
+  0% { transform: translateX(-1.2px); }
+  50% { transform: translateX(1.2px); }
+  100% { transform: translateX(-1.2px); }
+}
+
+@keyframes rc-drip {
+  0% { transform: translateY(-4px); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(14px); opacity: 0; }
+}
+
+@keyframes rc-sway {
+  from { transform: rotate(-6deg) translateY(0); }
+  to { transform: rotate(6deg) translateY(-6px); }
+}
+
+@keyframes rc-pump-l {
+  from { transform: rotate(40deg); }
+  to { transform: rotate(140deg); }
+}
+
+@keyframes rc-pump-r {
+  from { transform: rotate(-90deg); }
+  to { transform: rotate(-20deg); }
+}
+
+@keyframes rc-wave {
+  from { transform: rotate(110deg); }
+  to { transform: rotate(150deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rc *,
+  .rc {
+    animation: none !important;
+  }
+  .rc-scribble {
+    stroke-dashoffset: 0;
+  }
+}
