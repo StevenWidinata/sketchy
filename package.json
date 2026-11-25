@@ -1,0 +1,44 @@
+{
+  "name": "sketchy",
+  "version": "1.0.0",
+  "description": "A free realtime multiplayer draw-and-guess game",
+  "scripts": {
+    "dev": "concurrently -k -n server,client -c gray,green \"tsx watch server/src/index.ts\" \"vite\"",
+    "build": "vite build",
+    "start": "tsx server/src/index.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "e2e": "playwright test"
+  },
+  "author": "Steven Widinata",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "5.3.0",
+    "@fontsource/caveat": "5.3.0",
+    "express": "5.3.0",
+    "helmet": "8.3.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "socket.io": "4.8.4",
+    "socket.io-client": "4.8.4",
+    "zod": "4.6.7",
+    "tsx": "4.23.15"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1",
+    "@types/express": "5.0.6",
+    "@types/node": "26.6.10",
+    "@types/react": "19.3.2",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.3.0",
+    "concurrently": "10.0.7",
+    "typescript": "7.0.2",
+    "vite": "8.3.8",
+    "vitest": "5.1.1"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  }
+}

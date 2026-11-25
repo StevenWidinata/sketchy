@@ -1,0 +1,49 @@
+:root {
+  /* Ink ramp: neutral with a faint cool tint, like marker ink on a night desk */
+  --ink-0: #0c0d10;
+  --bg: #111216;
+  --surface-1: #17181d;
+  --surface-2: #1d1e24;
+  --surface-3: #25262d;
+  --line: rgba(244, 241, 234, 0.08);
+  --line-strong: rgba(244, 241, 234, 0.14);
+
+  --text: #f4f1ea;
+  --text-2: #b3b0a8;
+  --text-3: #7f7d77;
+
+  --paper: #f4f1ea;
+  --paper-canvas: #fbf9f4;
+  --paper-ink: #16171c;
+  --paper-ink-2: #5c5a55;
+
+  --lime: #d4ff3f;
+  --lime-press: #c2ee2c;
+  --on-lime: #16171c;
+  --coral: #ff5a4e;
+  --coral-soft: rgba(255, 90, 78, 0.14);
+  --lime-soft: rgba(212, 255, 63, 0.12);
+
+  --font-ui: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-hand: "Caveat", "Comic Sans MS", cursive;
+
+  --r-control: 10px;
+  --r-card: 16px;
+  --r-panel: 20px;
+
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --t-fast: 120ms;
+  --t-mid: 240ms;
+  --t-slow: 420ms;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+}
