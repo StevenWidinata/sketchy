@@ -1,0 +1,599 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.logo-word {
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.03em;
+}
+
+.logo-link {
+  text-decoration: none;
+  border-radius: var(--r-control);
+}
+
+.landing {
+  min-height: 100dvh;
+  overflow-x: clip;
+}
+
+.landing-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-6);
+  padding-top: max(var(--space-5), env(safe-area-inset-top));
+  animation: drop-in 600ms var(--ease) both;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 var(--space-3);
+  border-radius: var(--r-control);
+  color: var(--text-2);
+  text-decoration: none;
+  font-weight: 500;
+  transition:
+    color var(--t-fast) var(--ease),
+    background-color var(--t-fast) var(--ease);
+}
+
+.nav-link:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+/* ---------- hero ---------- */
+
+.hero {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) 0;
+  text-align: center;
+}
+
+.hero-head {
+  position: relative;
+  display: inline-block;
+}
+
+.hero-title {
+  display: grid;
+  font-size: clamp(56px, 9.6vw, 136px);
+  line-height: 0.88;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+}
+
+.hero-line {
+  display: block;
+  animation: rise-blur 900ms var(--ease) both;
+}
+
+.hero-line:nth-child(1) {
+  animation-delay: 120ms;
+}
+
+.hero-line:nth-child(2) {
+  animation-delay: 260ms;
+}
+
+.hero-raccoon {
+  position: absolute;
+  left: calc(100% + 8px);
+  bottom: -14px;
+  width: clamp(120px, 14vw, 200px);
+  animation: pop-in 700ms var(--ease) 500ms both;
+}
+
+.hero-raccoon .rc {
+  width: 100%;
+  height: auto;
+}
+
+.note {
+  position: absolute;
+  color: var(--lime);
+  font-size: 26px;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: fade-in 500ms var(--ease) 1100ms both;
+}
+
+.note-arrow {
+  position: absolute;
+  width: 72px;
+  height: 48px;
+  overflow: visible;
+}
+
+.note-arrow path {
+  fill: none;
+  stroke: var(--lime);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 700ms var(--ease) 1300ms forwards;
+}
+
+.note-raccoon {
+  bottom: calc(100% + 4px);
+  left: -24px;
+  transform: rotate(-6deg);
+}
+
+.note-raccoon .note-arrow {
+  top: 24px;
+  left: 84px;
+  width: 56px;
+  height: 40px;
+  transform: rotate(18deg);
+}
+
+.hero-sub {
+  max-width: 46ch;
+  margin: var(--space-8) auto 0;
+  color: var(--text-2);
+  font-size: clamp(17px, 1.6vw, 20px);
+  line-height: 1.55;
+  animation: rise 700ms var(--ease) 420ms both;
+}
+
+.hero-panel {
+  position: relative;
+  max-width: 440px;
+  margin: var(--space-10) auto 0;
+  text-align: left;
+  animation: rise 700ms var(--ease) 540ms both;
+}
+
+.note-free {
+  top: 32px;
+  right: calc(100% + 40px);
+  transform: rotate(-8deg);
+}
+
+.note-free .note-arrow {
+  top: 26px;
+  right: -64px;
+}
+
+.join-panel {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  border-radius: var(--r-panel);
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+}
+
+.join-create {
+  width: 100%;
+}
+
+.join-or {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text-3);
+  font-size: 14px;
+  margin: calc(var(--space-1) * -1) 0;
+}
+
+.join-or::before,
+.join-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.join-code {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.join-code .btn {
+  height: 48px;
+}
+
+.join-actions .btn {
+  width: 100%;
+}
+
+.field-error,
+.form-error {
+  color: var(--coral);
+  font-size: 14px;
+}
+
+.form-error:empty {
+  display: none;
+}
+
+/* ---------- cards ---------- */
+
+.cards-band {
+  position: relative;
+  margin-top: var(--space-16);
+  animation: rise 900ms var(--ease) 700ms both;
+}
+
+.note-cards {
+  position: relative;
+  display: block;
+  text-align: center;
+  margin-bottom: var(--space-2);
+  transform: rotate(-2deg);
+}
+
+.carousel {
+  position: relative;
+}
+
+.carousel-stage {
+  position: relative;
+  height: 400px;
+  overflow: hidden;
+  perspective: 1300px;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.carousel-stage.is-dragging {
+  cursor: grabbing;
+}
+
+.carousel-track {
+  position: absolute;
+  left: 50%;
+  top: 40px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform-style: preserve-3d;
+}
+
+.doodle-card {
+  position: absolute;
+  left: -104px;
+  top: 0;
+  width: 208px;
+  height: 284px;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4);
+  border-radius: var(--r-card);
+  background: var(--paper);
+  color: var(--paper-ink);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.doodle-card-cat {
+  align-self: flex-start;
+  padding: 2px var(--space-2);
+  border-radius: 6px;
+  background: rgba(22, 23, 28, 0.07);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--paper-ink-2);
+}
+
+.doodle {
+  width: 100%;
+  height: 128px;
+  margin: var(--space-2) 0 auto;
+  overflow: visible;
+}
+
+.doodle path {
+  fill: none;
+  stroke: var(--paper-ink);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.doodle.is-drawn path {
+  animation: draw 900ms var(--ease) forwards;
+}
+
+.doodle-card-chat {
+  display: grid;
+  gap: var(--space-1);
+  padding-top: var(--space-3);
+  border-top: 1px dashed rgba(22, 23, 28, 0.18);
+}
+
+.guess {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  min-width: 0;
+}
+
+.guess-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.guess-name {
+  font-weight: 600;
+}
+
+.guess-wrong s {
+  color: var(--paper-ink-2);
+  text-decoration-thickness: 1.5px;
+}
+
+.guess-right .swipe {
+  font-weight: 600;
+  padding: 0 2px;
+}
+
+.carousel-pause {
+  position: absolute;
+  right: var(--space-6);
+  bottom: var(--space-2);
+}
+
+/* ---------- how ---------- */
+
+.how {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-16) var(--space-6);
+}
+
+.section-title {
+  font-size: clamp(32px, 4vw, 48px);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  scroll-margin-top: var(--space-6);
+}
+
+.section-title-sm {
+  margin-top: var(--space-16);
+  font-size: clamp(24px, 2.6vw, 32px);
+}
+
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-8);
+  margin: var(--space-10) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.how-steps li {
+  counter-increment: step;
+  display: grid;
+  gap: var(--space-2);
+  align-content: start;
+}
+
+.how-steps li::before {
+  content: counter(step);
+  font-family: var(--font-hand);
+  font-weight: 600;
+  font-size: 56px;
+  line-height: 1;
+  color: var(--lime);
+}
+
+.how-steps h3 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.how-steps p {
+  color: var(--text-2);
+  max-width: 36ch;
+}
+
+.category-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.category-list li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--r-control);
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.category-list span {
+  color: var(--text-3);
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.landing-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+  padding-bottom: max(var(--space-8), env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  color: var(--text-3);
+  font-size: 14px;
+}
+
+.landing-foot .logo-word {
+  font-size: 17px;
+  color: var(--text-2);
+}
+
+/* ---------- motion ---------- */
+
+@keyframes rise-blur {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+    filter: blur(10px);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.85);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---------- small screens ---------- */
+
+@media (max-width: 1100px) {
+  .note-free {
+    display: none;
+  }
+}
+
+@media (max-width: 1060px) and (min-width: 761px) {
+  .hero-head {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+  }
+
+  .hero-raccoon {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    width: 150px;
+  }
+
+  .note-raccoon {
+    left: calc(100% - 10px);
+    bottom: 40%;
+  }
+
+  .note-raccoon .note-arrow {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .landing-nav {
+    padding: var(--space-4);
+  }
+
+  .hero {
+    padding: var(--space-4) var(--space-4) 0;
+  }
+
+  .hero-head {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+  }
+
+  .hero-raccoon {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    width: 128px;
+    margin-bottom: var(--space-2);
+  }
+
+  .note-raccoon {
+    display: none;
+  }
+
+  .hero-sub {
+    margin-top: var(--space-5);
+  }
+
+  .hero-panel {
+    margin-top: var(--space-6);
+  }
+
+  .join-panel {
+    padding: var(--space-5);
+  }
+
+  .carousel-stage {
+    height: 330px;
+  }
+
+  .carousel-track {
+    top: 24px;
+  }
+
+  .how {
+    padding: var(--space-12) var(--space-4);
+  }
+
+  .how-steps {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  .landing-foot {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
