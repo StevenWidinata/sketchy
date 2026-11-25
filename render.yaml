@@ -1,11 +1,12 @@
-# One Render web service runs the game server and serves the built website.
-# Deploy: Render dashboard -> New -> Blueprint -> pick this repo.
+# The game server (rooms, timers, scores, WebSockets). The website itself is on Vercel.
+# First-time setup: Render dashboard -> New -> Blueprint -> pick this repo.
+# After that, every push to main redeploys it automatically.
 services:
   - type: web
     name: sketchy
     runtime: node
     plan: free
-    buildCommand: npm ci && npm run build
+    buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /healthz
     autoDeploy: true
@@ -14,3 +15,9 @@ services:
         value: production
       - key: NODE_VERSION
         value: "24"
+      # The website. Browsers from here may connect, and the server's own URL redirects here.
+      - key: CLIENT_URL
+        value: https://sketchy-swart.vercel.app
+      # Vercel preview deployments of this project.
+      - key: CLIENT_ORIGIN_PATTERN
+        value: ^https://sketchy-[a-z0-9-]+-stacker4\.vercel\.app$
