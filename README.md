@@ -3,7 +3,7 @@
 A free, realtime multiplayer drawing and guessing game. One player draws a word, everyone else races to guess it in chat. Play in any browser, on a phone or a laptop, with 2 to 20 friends.
 
 - Create a room and share the 5-letter code or the invite link. No sign-up.
-- 20 word categories, in English or Bahasa Indonesia. The category is shown while you guess.
+- 36 word categories with about 2,200 words, in English or Bahasa Indonesia. Three harder ones (feelings, idioms, two-person scenes) are off unless the host ticks them. The category is shown while you guess, and no word is shown twice in a game, even ones the drawer skipped.
 - The host sets rounds, draw time, word choices, max players, language and categories, and can add custom words.
 - Pen, eraser, fill bucket, 16 colors, 4 brush sizes, undo and clear. Works with mouse, finger and stylus.
 - Letter hints at half time and three quarters. Faster guesses score more; the drawer scores for every solver.

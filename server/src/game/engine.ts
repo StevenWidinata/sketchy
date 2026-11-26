@@ -41,6 +41,7 @@ export interface RoomData {
   phaseDuration: number;
   likes: string[];
   dislikes: string[];
+  /** Keys of every word shown this game, oldest first. Cleared when a game starts. */
   usedWords: string[];
   endReason: RoomState["endReason"];
   solvedCount: number;
@@ -288,9 +289,11 @@ export class Game {
     d.hintPositions = [];
     d.endReason = null;
     d.solvedCount = 0;
-    const used = new Set(d.usedWords);
-    d.choices = pickChoices(d.settings, d.settings.wordChoices, used, this.rng);
-    d.usedWords = [...used];
+    // Every word shown to the drawer counts as seen, picked or not, so it won't come back this game.
+    const picks = pickChoices(d.settings, d.settings.wordChoices, d.usedWords, this.rng);
+    const shown = new Set(picks.map((w) => w.key));
+    d.usedWords = [...d.usedWords.filter((k) => !shown.has(k)), ...shown];
+    d.choices = picks.map(({ word, categoryId }) => ({ word, categoryId }));
     this.setPhase("choosing", at, TIMING.chooseSeconds);
   }
 
@@ -300,7 +303,6 @@ export class Game {
     const pick = d.choices[index];
     if (!pick) return fail("Pick one of the words shown.");
     d.word = pick;
-    d.usedWords.push(pick.word);
     d.hintPositions = hintOrder(pick.word, this.rng);
     this.setPhase("drawing", now, d.settings.drawTime);
     return OK;

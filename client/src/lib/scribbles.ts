@@ -286,6 +286,19 @@ export function layout(width: number, height: number, mode: ScribbleMode, clear:
   return out;
 }
 
+/* ---------- stamping from elsewhere (the raccoon doodles for you) ---------- */
+
+let stampHandler: ((x: number, y: number) => boolean) | null = null;
+
+export function setStampHandler(fn: ((x: number, y: number) => boolean) | null) {
+  stampHandler = fn;
+}
+
+/** Stamps a scribble at a point in document coordinates. Returns false when the page is in calm mode. */
+export function stampScribble(x: number, y: number): boolean {
+  return stampHandler?.(x, y) ?? false;
+}
+
 /* ---------- which mode the current screen wants ---------- */
 
 let mode: ScribbleMode = "full";

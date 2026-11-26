@@ -8,7 +8,7 @@ import { renderAll, renderUpTo, timelineLength } from "../../lib/drawing";
 import { playAgain } from "../../lib/net";
 import { useGame } from "../../lib/store";
 import { Icon } from "../Icon";
-import { Raccoon } from "../Raccoon";
+import { InteractiveRaccoon } from "../InteractiveRaccoon";
 import { Avatar } from "./PlayerList";
 import { RoomHeader } from "./RoomHeader";
 
@@ -43,7 +43,7 @@ export function Podium({ onLeave }: { onLeave: () => void }) {
           </h1>
           <div className="podium-stage">
             <div className="podium-raccoon">
-              <Raccoon mood="dance" size="100%" />
+              <InteractiveRaccoon mood="dance" />
             </div>
             <ol className="podium-blocks">
               {[second, first, third].map((p, i) =>

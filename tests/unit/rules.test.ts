@@ -90,17 +90,28 @@ describe("input cleaning", () => {
 });
 
 describe("word pool", () => {
-  it("has 20 categories with words in both languages", () => {
-    expect(CATEGORIES).toHaveLength(20);
+  it("has 36 categories with plenty of words in both languages", () => {
+    expect(CATEGORIES).toHaveLength(36);
     for (const c of CATEGORIES) {
-      expect(c.words.length).toBeGreaterThanOrEqual(25);
+      expect(c.words.length, c.id).toBeGreaterThanOrEqual(35);
       for (const [en, id] of c.words) {
         expect(en.trim()).toBe(en);
         expect(id.trim()).toBe(id);
         expect(en.length).toBeGreaterThan(1);
         expect(id.length).toBeGreaterThan(1);
+        expect(en).toBe(en.toLowerCase());
+        expect(id).toBe(id.toLowerCase());
+        // An apostrophe would show as an extra blank in the letter hints.
+        expect(en + id).not.toContain("'");
       }
     }
+  });
+
+  it("never repeats a word, in either language, across all categories", () => {
+    const en = CATEGORIES.flatMap((c) => c.words.map((w) => w[0]));
+    const id = CATEGORIES.flatMap((c) => c.words.map((w) => w[1]));
+    expect(en.filter((w, i) => en.indexOf(w) !== i)).toEqual([]);
+    expect(id.filter((w, i) => id.indexOf(w) !== i)).toEqual([]);
   });
 
   it("filters by category and language", () => {
@@ -109,21 +120,43 @@ describe("word pool", () => {
     expect(pool.map((w) => w.word)).toContain("jerapah");
   });
 
+  it("leaves the hard categories out unless the host picks them", () => {
+    const hard = CATEGORIES.filter((c) => c.hard).map((c) => c.id);
+    expect(hard).toEqual(["emotions", "idioms", "duo"]);
+    expect(buildPool(settings()).some((w) => hard.includes(w.categoryId))).toBe(false);
+    expect(buildPool(settings({ categories: ["idioms"] })).every((w) => w.categoryId === "idioms")).toBe(true);
+  });
+
+  it("keys words the same in both languages", () => {
+    const en = buildPool(settings({ categories: ["animals"] }));
+    const id = buildPool(settings({ categories: ["animals"], language: "id" }));
+    expect(en.map((w) => w.key)).toEqual(id.map((w) => w.key));
+  });
+
   it("uses only custom words when asked", () => {
     const pool = buildPool(settings({ customWords: ["office plant", "karaoke"], customOnly: true }));
-    expect(pool).toEqual([
+    expect(pool.map(({ word, categoryId }) => ({ word, categoryId }))).toEqual([
       { word: "office plant", categoryId: "custom" },
       { word: "karaoke", categoryId: "custom" },
     ]);
   });
 
-  it("picks distinct words and avoids repeats until the pool runs dry", () => {
-    const s = settings({ customWords: ["a1", "b2", "c3", "d4"], customOnly: true });
-    const used = new Set<string>();
-    const first = pickChoices(s, 2, used);
-    expect(new Set(first.map((w) => w.word)).size).toBe(2);
-    first.forEach((w) => used.add(w.word));
-    const second = pickChoices(s, 2, used);
-    expect(second.some((w) => used.has(w.word))).toBe(false);
+  it("never shows a seen word again until every word has been seen, then the oldest come back first", () => {
+    const s = settings({ customWords: ["a1", "b2", "c3", "d4", "e5"], customOnly: true });
+    const seen: string[] = [];
+    const shown: string[] = [];
+    for (let turn = 0; turn < 2; turn++) {
+      const picks = pickChoices(s, 2, seen);
+      expect(new Set(picks.map((w) => w.key)).size).toBe(2);
+      for (const p of picks) {
+        expect(seen).not.toContain(p.key);
+        seen.push(p.key);
+        shown.push(p.word);
+      }
+    }
+    // One fresh word left: it comes first, then the word seen longest ago.
+    const last = pickChoices(s, 2, seen);
+    const fresh = ["a1", "b2", "c3", "d4", "e5"].find((w) => !shown.includes(w));
+    expect(last.map((w) => w.word)).toEqual([fresh, shown[0]]);
   });
 });

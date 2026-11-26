@@ -1,7 +1,22 @@
 import { useEffect, useId, useRef } from "react";
 import "../styles/raccoon.css";
 
-export type RaccoonMood = "idle" | "think" | "cheer" | "panic" | "dance" | "wave" | "sad";
+export type RaccoonMood =
+  | "idle"
+  | "think"
+  | "cheer"
+  | "panic"
+  | "dance"
+  | "wave"
+  | "sad"
+  // Reactions to being poked, held and thrown (InteractiveRaccoon)
+  | "giggle"
+  | "trick"
+  | "doodle"
+  | "dizzy"
+  | "grumpy"
+  | "held"
+  | "walk";
 
 const FUR = "#8e919b";
 const DARK = "#24252b";
@@ -122,10 +137,25 @@ export function Raccoon({ mood = "idle", follow = false, size = 220, className =
               <circle cx="136.5" cy="97.5" r="2" fill="#fff" />
             </g>
           </g>
+          <g className="rc-eyes-closed" fill="none" stroke="#fff" strokeWidth="4.5" strokeLinecap="round">
+            <path d="M76 102Q86 90 96 102" />
+            <path d="M124 102Q134 90 144 102" />
+          </g>
+          <g className="rc-eyes-dizzy" fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round">
+            <circle cx="86" cy="99" r="11" fill="#fff" stroke="none" />
+            <circle cx="134" cy="99" r="11" fill="#fff" stroke="none" />
+            <path className="rc-spiral" d="M86 99m0-1.5a1.5 1.5 0 1 1-1.5 1.5a3.5 3.5 0 1 1 3.5 3.5a5.5 5.5 0 1 1 5.5-5.5a7.5 7.5 0 1 1-7.5-7.5" />
+            <path className="rc-spiral" d="M134 99m0-1.5a1.5 1.5 0 1 1-1.5 1.5a3.5 3.5 0 1 1 3.5 3.5a5.5 5.5 0 1 1 5.5-5.5a7.5 7.5 0 1 1-7.5-7.5" />
+          </g>
+          <g className="rc-brows" fill="none" stroke={INK} strokeWidth="4.5" strokeLinecap="round">
+            <path d="M72 80L98 88" />
+            <path d="M148 80L122 88" />
+          </g>
           <ellipse cx="110" cy="119" rx="9" ry="6" fill={INK} />
           <ellipse cx="107" cy="117" rx="3" ry="1.6" fill="#fff" opacity="0.6" />
           <path className="rc-mouth rc-mouth-calm" d="M100 129Q105 135 110 129Q115 135 120 129" fill="none" stroke={INK} strokeWidth="3" strokeLinecap="round" />
           <path className="rc-mouth rc-mouth-open" d="M98 128Q110 148 122 128Z" fill="#5a2630" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+          <ellipse className="rc-mouth rc-mouth-o" cx="110" cy="135" rx="5" ry="6" fill="#5a2630" stroke={INK} strokeWidth="3" />
           <path className="rc-mouth rc-mouth-sad" d="M100 134Q110 126 120 134" fill="none" stroke={INK} strokeWidth="3" strokeLinecap="round" />
           <path
             className="rc-sweat"
@@ -140,7 +170,7 @@ export function Raccoon({ mood = "idle", follow = false, size = 220, className =
           className="rc-scribble"
           d="M182 232C188 224 194 238 200 230C205 223 210 236 218 228"
           fill="none"
-          stroke="var(--lime, #d4ff3f)"
+          stroke="var(--accent, #3fa9f5)"
           strokeWidth="4"
           strokeLinecap="round"
           pathLength={1}
@@ -149,7 +179,7 @@ export function Raccoon({ mood = "idle", follow = false, size = 220, className =
         <g className="rc-arm-r">
           <ellipse cx="164" cy="172" rx="11" ry="20" transform="rotate(-50 164 172)" fill={FUR} stroke={INK} strokeWidth="4" />
           <g transform="translate(178 182) rotate(60)">
-            <rect x="-45" y="-7" width="13" height="14" rx="3" fill="var(--lime, #d4ff3f)" stroke={INK} strokeWidth="3" />
+            <rect x="-45" y="-7" width="13" height="14" rx="3" fill="var(--accent, #3fa9f5)" stroke={INK} strokeWidth="3" />
             <rect x="-33" y="-7" width="8" height="14" fill="#c9c6bd" stroke={INK} strokeWidth="3" />
             <rect x="-25" y="-7" width="50" height="14" fill="#ffd23f" stroke={INK} strokeWidth="3" />
             <path d="M-25 0H25" stroke="#e0a800" strokeWidth="2" />

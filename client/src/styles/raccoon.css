@@ -268,3 +268,251 @@
     stroke-dashoffset: 0;
   }
 }
+
+/* ---------- reactions when poked, held or thrown ---------- */
+
+.rc-eyes-closed,
+.rc-eyes-dizzy,
+.rc-brows,
+.rc-mouth-o {
+  display: none;
+}
+
+.rc-spiral {
+  transform-origin: 50% 50%;
+}
+
+/* giggle: eyes squeezed shut, wiggling */
+.rc--giggle .rc-eyes,
+.rc--trick .rc-eyes {
+  display: none;
+}
+
+.rc--giggle .rc-eyes-closed,
+.rc--trick .rc-eyes-closed {
+  display: inline;
+}
+
+.rc--giggle .rc-mouth-calm,
+.rc--doodle .rc-mouth-calm,
+.rc--trick .rc-mouth-calm {
+  display: none;
+}
+
+.rc--giggle .rc-mouth-open,
+.rc--doodle .rc-mouth-open,
+.rc--trick .rc-mouth-open {
+  display: inline;
+}
+
+.rc--giggle .rc-all {
+  animation: rc-squirm 0.11s linear infinite alternate;
+}
+
+.rc--giggle .rc-arm-l {
+  transform: rotate(-30deg);
+}
+
+.rc--giggle .rc-arm-r {
+  transform: rotate(18deg);
+}
+
+/* trick: a jump with a full spin */
+.rc--trick .rc-all {
+  animation: rc-flip 0.9s cubic-bezier(0.3, 0.7, 0.3, 1) both;
+}
+
+.rc--trick .rc-arm-l {
+  transform: rotate(130deg);
+}
+
+.rc--trick .rc-arm-r {
+  transform: rotate(-30deg) translateY(-6px);
+}
+
+/* doodle: quick scribbles in the air */
+.rc--doodle .rc-arm-r {
+  animation: rc-scribble 0.09s linear infinite alternate;
+}
+
+.rc--doodle .rc-scribble {
+  animation: rc-draw 1.1s linear both;
+}
+
+/* dizzy: spinning spiral eyes, wobbling head */
+.rc--dizzy .rc-eyes {
+  display: none;
+}
+
+.rc--dizzy .rc-eyes-dizzy {
+  display: inline;
+}
+
+.rc--dizzy .rc-spiral {
+  animation: rc-spin 0.6s linear infinite;
+}
+
+.rc--dizzy .rc-head {
+  animation: rc-wobble 0.5s ease-in-out infinite alternate;
+}
+
+.rc--dizzy .rc-mouth-calm {
+  display: none;
+}
+
+.rc--dizzy .rc-mouth-sad {
+  display: inline;
+}
+
+/* grumpy: arms crossed, frowning */
+.rc--grumpy .rc-brows {
+  display: inline;
+}
+
+.rc--grumpy .rc-mouth-calm {
+  display: none;
+}
+
+.rc--grumpy .rc-mouth-sad {
+  display: inline;
+}
+
+.rc--grumpy .rc-arm-l {
+  transform: rotate(-62deg) translate(10px, -4px);
+}
+
+.rc--grumpy .rc-arm-r {
+  transform: rotate(-84deg) translate(-4px, -8px);
+}
+
+.rc--grumpy .rc-head {
+  transform: rotate(-6deg);
+}
+
+.rc--grumpy .rc-tail {
+  animation: rc-tail 0.4s ease-in-out infinite alternate;
+}
+
+/* held: surprised, arms up, legs dangling */
+.rc--held .rc-mouth-calm {
+  display: none;
+}
+
+.rc--held .rc-mouth-o {
+  display: inline;
+}
+
+.rc--held .rc-pupils {
+  transform: scale(0.7);
+  transform-origin: center;
+}
+
+.rc--held .rc-arm-l {
+  transform: rotate(140deg);
+}
+
+.rc--held .rc-arm-r {
+  transform: rotate(-40deg) translateY(-8px);
+}
+
+.rc--held .rc-body {
+  animation: rc-dangle 0.35s ease-in-out infinite alternate;
+}
+
+/* walk: bobbing back home */
+.rc--walk .rc-all {
+  animation: rc-walk 0.28s ease-in-out infinite alternate;
+}
+
+@keyframes rc-squirm {
+  from { transform: rotate(-4deg); }
+  to { transform: rotate(4deg) translateY(-2px); }
+}
+
+@keyframes rc-flip {
+  0% { transform: translateY(0) rotate(0); }
+  15% { transform: translateY(0) scaleY(0.9); }
+  55% { transform: translateY(-34px) rotate(-200deg); }
+  85% { transform: translateY(0) rotate(-360deg); }
+  100% { transform: translateY(0) rotate(-360deg); }
+}
+
+@keyframes rc-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rc-wobble {
+  from { transform: rotate(-8deg); }
+  to { transform: rotate(8deg); }
+}
+
+@keyframes rc-dangle {
+  from { transform: rotate(-3deg); }
+  to { transform: rotate(3deg); }
+}
+
+@keyframes rc-walk {
+  from { transform: translateY(0) rotate(-3deg); }
+  to { transform: translateY(-5px) rotate(3deg); }
+}
+
+/* ---------- the pressable raccoon ---------- */
+
+.rc-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 40%;
+  background: none;
+  color: inherit;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rc-btn.is-sized {
+  display: inline-block;
+  width: auto;
+}
+
+.rc-btn:active {
+  cursor: grabbing;
+}
+
+.rc-btn.is-away {
+  visibility: hidden;
+}
+
+.rc-btn.is-off {
+  pointer-events: none;
+}
+
+.rc-btn .rc {
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.rc-flyer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 90;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.rc-flyer .rc {
+  width: 100%;
+  height: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rc-spiral,
+  .rc-all {
+    animation: none !important;
+  }
+}

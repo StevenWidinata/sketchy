@@ -181,6 +181,28 @@ describe("Game", () => {
     expect(state().phase).toBe("lobby");
   });
 
+  it("never shows a word twice in a game, even ones the drawer skipped, and starts fresh next game", () => {
+    const { game, join, state, tick, now } = setup();
+    const a = join("Rina");
+    join("Bayu");
+    game.updateSettings(a, { rounds: 8, categories: ["animals"] });
+    game.start(a, now());
+    const shown: string[] = [];
+    for (let turn = 0; turn < 16; turn++) {
+      const drawer = state().drawerId!;
+      shown.push(...game.privateFor(drawer).choices!.map((c) => c.word));
+      game.choose(drawer, 0, now());
+      tick(80_000 + 6_000);
+    }
+    expect(state().phase).toBe("podium");
+    expect(shown).toHaveLength(48);
+    expect(new Set(shown).size).toBe(48);
+
+    game.again(a);
+    expect(game.start(a, now()).ok).toBe(true);
+    expect(game.data.usedWords).toHaveLength(3);
+  });
+
   it("skips the turn when the drawer goes away, and stops the game below 2 players", () => {
     const { game, join, state, tick, now } = setup();
     const a = join("Rina");

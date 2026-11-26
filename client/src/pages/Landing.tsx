@@ -2,7 +2,7 @@ import { CATEGORIES } from "../../../shared/words";
 import { Carousel } from "../components/Carousel";
 import { JoinPanel } from "../components/JoinPanel";
 import { Logo } from "../components/Logo";
-import { Raccoon } from "../components/Raccoon";
+import { InteractiveRaccoon } from "../components/InteractiveRaccoon";
 import { useScribbles } from "../lib/scribbles";
 import "../styles/landing.css";
 
@@ -32,7 +32,7 @@ export function Landing({ navigate }: { navigate: (path: string) => void }) {
               <span className="hero-line">Guess fast.</span>
             </h1>
             <div className="hero-raccoon" data-clear>
-              <Raccoon mood="idle" follow size="100%" />
+              <InteractiveRaccoon mood="idle" follow />
               <p className="note note-raccoon hand" aria-hidden="true">
                 judges every drawing
                 <svg viewBox="0 0 90 60" className="note-arrow">
@@ -60,7 +60,7 @@ export function Landing({ navigate }: { navigate: (path: string) => void }) {
 
         <section className="cards-band" aria-label="Example rounds" data-paper>
           <p className="note note-cards hand" aria-hidden="true">
-            20 categories, in English or Bahasa Indonesia
+            {CATEGORIES.length} categories, in English or Bahasa Indonesia
           </p>
           <Carousel />
         </section>
@@ -72,7 +72,7 @@ export function Landing({ navigate }: { navigate: (path: string) => void }) {
           <ol className="how-steps">
             <li>
               <h3>The host sets the table</h3>
-              <p>Choose rounds, draw time, language and which of the 20 categories to play. Add your own words if you like.</p>
+              <p>Choose rounds, draw time, language and which of the {CATEGORIES.length} categories to play. Add your own words if you like.</p>
             </li>
             <li>
               <h3>One draws, everyone guesses</h3>

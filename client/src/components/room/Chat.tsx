@@ -4,7 +4,16 @@ import { sendChat } from "../../lib/net";
 import { useGame } from "../../lib/store";
 import { Icon } from "../Icon";
 
-export function Chat({ placeholder, compact }: { placeholder: string; compact?: boolean }) {
+export function Chat({
+  placeholder,
+  compact,
+  onFocusChange,
+}: {
+  placeholder: string;
+  compact?: boolean;
+  /** Told when the input gains or loses focus, so the game can make room for the phone keyboard. */
+  onFocusChange?: (focused: boolean) => void;
+}) {
   const lines = useGame((s) => s.chat);
   const listRef = useRef<HTMLOListElement>(null);
   const stick = useRef(true);
@@ -75,8 +84,11 @@ export function Chat({ placeholder, compact }: { placeholder: string; compact?: 
           placeholder={placeholder}
           value={text}
           onChange={(e) => setText(e.target.value)}
+          onFocus={() => onFocusChange?.(true)}
+          onBlur={() => onFocusChange?.(false)}
         />
-        <button type="submit" className="icon-btn chat-send" aria-label="Send" disabled={!text.trim()}>
+        {/* Keep focus in the input when tapping Send, so the phone keyboard stays open for the next guess. */}
+        <button type="submit" className="icon-btn chat-send" aria-label="Send" disabled={!text.trim()} onPointerDown={(e) => e.preventDefault()}>
           <Icon name="send" />
         </button>
       </form>

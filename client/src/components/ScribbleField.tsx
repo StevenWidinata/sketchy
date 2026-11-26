@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { currentAccent } from "../lib/accent";
-import { getScribbleMode, layout, onScribbleMode, randomScribble, rng, type Pt, type Rect, type Scribble } from "../lib/scribbles";
+import { getScribbleMode, layout, onScribbleMode, randomScribble, rng, setStampHandler, type Pt, type Rect, type Scribble } from "../lib/scribbles";
 import { play } from "../lib/sound";
 
 /** Scribbles never sit under these: text, controls, pictures and panels. */
@@ -374,8 +374,20 @@ export function ScribbleField() {
       scheduleRebuild(0);
     });
 
+    setStampHandler((x, y) => {
+      if (getScribbleMode().mode !== "full") return false;
+      stamp(x, y);
+      return true;
+    });
+
     const bodyObserver = new ResizeObserver(() => scheduleRebuild());
     bodyObserver.observe(document.body);
+    // Content can move without the page changing size (a player joins the lobby), so watch the DOM too.
+    // During a turn the timer and chat change constantly; the faint calm scribbles don't need to follow them.
+    const domObserver = new MutationObserver(() => {
+      if (getScribbleMode().mode === "full") scheduleRebuild(250);
+    });
+    domObserver.observe(document.getElementById("root") ?? document.body, { childList: true, subtree: true, characterData: true });
 
     sizeCanvas();
     // Wait for fonts so the first layout (and its one draw-in) is the final one.
@@ -400,7 +412,9 @@ export function ScribbleField() {
       window.clearTimeout(rebuildTimer);
       window.clearTimeout(fontTimeout);
       offMode();
+      setStampHandler(null);
       bodyObserver.disconnect();
+      domObserver.disconnect();
       window.removeEventListener("resize", onResize);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("pointermove", onMove);

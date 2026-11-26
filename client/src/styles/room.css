@@ -1936,3 +1936,91 @@
     padding: 0 var(--space-3);
   }
 }
+
+/* ---------- phone typing: keep the drawing above the keyboard ---------- */
+
+@media (max-width: 960px) {
+  /* Follow the visible area exactly, wherever the browser panned it. */
+  .game.is-typing {
+    position: fixed;
+    top: var(--vv-top, 0px);
+    left: 0;
+    right: 0;
+    height: var(--vvh, 100dvh);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+
+  .game.is-typing .topbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: 0;
+    padding: var(--space-1) var(--space-3);
+  }
+
+  .game.is-typing .topbar-start,
+  .game.is-typing .topbar-end .icon-btn,
+  .game.is-typing .stage-raccoon,
+  .game.is-typing .reactions,
+  .game.is-typing .drawer-note,
+  .game.is-typing .mobile-tabs,
+  .game.is-typing .mobile-players {
+    display: none;
+  }
+
+  .game.is-typing .topbar-end .timer {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* The drawing takes the biggest 4:3 box that fits the space left. */
+  .game.is-typing .game-stage {
+    container-type: size;
+    align-items: center;
+    padding: var(--space-1) var(--space-3);
+    overflow: hidden;
+  }
+
+  .game.is-typing .stage-inner {
+    width: min(100cqw, calc(100cqh * 4 / 3));
+    min-width: 0;
+  }
+
+  .game.is-typing .chat-wrap {
+    display: flex;
+  }
+
+  /* Only the newest few lines, right above the input. */
+  .game.is-typing .chat-log {
+    flex: none;
+    height: 76px;
+    padding-top: var(--space-1);
+    padding-bottom: 0;
+  }
+
+  .game.is-typing .chat-empty {
+    display: none;
+  }
+
+  .game.is-typing .chat-form {
+    padding: var(--space-2) var(--space-3);
+  }
+}
+
+.cat-subhead {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.cat-subhead span {
+  font-weight: 400;
+  color: var(--text-3);
+}
+
+/* The stage raccoon ignores clicks around it, but the raccoon itself can be poked. */
+.stage-raccoon .rc-btn:not(.is-off) {
+  pointer-events: auto;
+}

@@ -1,11 +1,14 @@
 import { useEffect, useId, useState } from "react";
 import { LIMITS, SETTING_OPTIONS } from "../../../../shared/constants";
 import type { Settings } from "../../../../shared/types";
-import { CATEGORIES } from "../../../../shared/words";
+import { CATEGORIES, DEFAULT_CATEGORY_IDS } from "../../../../shared/words";
+
+const NORMAL = CATEGORIES.filter((c) => !c.hard);
+const HARD = CATEGORIES.filter((c) => c.hard);
 import { startGame, updateSettings } from "../../lib/net";
 import { toast, useGame } from "../../lib/store";
 import { Icon } from "../Icon";
-import { Raccoon } from "../Raccoon";
+import { InteractiveRaccoon } from "../InteractiveRaccoon";
 import { PlayerList } from "./PlayerList";
 import { RoomHeader } from "./RoomHeader";
 import { Segmented } from "./Segmented";
@@ -41,12 +44,26 @@ export function Lobby({ onLeave }: { onLeave: () => void }) {
     }
   };
 
+  // No pick means the default set: every normal category, none of the hard ones.
   const allCategories = s.categories.length === 0;
+  const isOn = (id: string) => (allCategories ? DEFAULT_CATEGORY_IDS.includes(id) : s.categories.includes(id));
   const toggleCategory = (id: string) => {
-    const current = allCategories ? CATEGORIES.map((c) => c.id) : s.categories;
+    const current = allCategories ? DEFAULT_CATEGORY_IDS : s.categories;
     const next = current.includes(id) ? current.filter((c) => c !== id) : [...current, id];
-    update({ categories: next.length === CATEGORIES.length || next.length === 0 ? [] : next });
+    const isDefault = next.length === DEFAULT_CATEGORY_IDS.length && next.every((c) => DEFAULT_CATEGORY_IDS.includes(c));
+    update({ categories: isDefault || next.length === 0 ? [] : next });
   };
+  const chip = (c: (typeof CATEGORIES)[number]) => (
+    <li key={c.id}>
+      <label className={`cat-chip${isOn(c.id) ? " is-on" : ""}${s.customOnly ? " is-muted" : ""}`}>
+        <input type="checkbox" checked={isOn(c.id)} onChange={() => toggleCategory(c.id)} disabled={!isHost || s.customOnly} />
+        <span className="cat-check" aria-hidden="true">
+          <Icon name="check" size={14} />
+        </span>
+        {c.name[s.language]}
+      </label>
+    </li>
+  );
 
   const notReady =
     connected < LIMITS.playersMin
@@ -72,7 +89,7 @@ export function Lobby({ onLeave }: { onLeave: () => void }) {
               </h1>
               <p className="lobby-sub">Send friends this link, or tell them the code.</p>
             </div>
-            <Raccoon mood="wave" size={104} className="invite-raccoon" />
+            <InteractiveRaccoon mood="wave" size={104} className="invite-raccoon" />
           </div>
           <div className="invite-link">
             <span className="invite-url" translate="no">
@@ -158,29 +175,22 @@ export function Lobby({ onLeave }: { onLeave: () => void }) {
             <div className="setting-row">
               <span className="setting-label">Categories</span>
               <span className="setting-hint">
-                {allCategories ? "All 20 categories" : `${s.categories.length} of 20 picked`}
+                {allCategories ? `All ${NORMAL.length} categories` : `${s.categories.length} of ${CATEGORIES.length} picked`}
                 {isHost && !allCategories && (
                   <button type="button" className="link-btn" onClick={() => update({ categories: [] })}>
-                    Use all
+                    Reset
                   </button>
                 )}
               </span>
             </div>
             <ul className="cat-grid" aria-label="Categories">
-              {CATEGORIES.map((c) => {
-                const on = allCategories || s.categories.includes(c.id);
-                return (
-                  <li key={c.id}>
-                    <label className={`cat-chip${on ? " is-on" : ""}${s.customOnly ? " is-muted" : ""}`}>
-                      <input type="checkbox" checked={on} onChange={() => toggleCategory(c.id)} disabled={!isHost || s.customOnly} />
-                      <span className="cat-check" aria-hidden="true">
-                        <Icon name="check" size={14} />
-                      </span>
-                      {c.name[s.language]}
-                    </label>
-                  </li>
-                );
-              })}
+              {NORMAL.map(chip)}
+            </ul>
+            <p className="cat-subhead" id={`${ids}-hard`}>
+              Harder to draw <span>off unless you tick them</span>
+            </p>
+            <ul className="cat-grid" aria-labelledby={`${ids}-hard`}>
+              {HARD.map(chip)}
             </ul>
           </div>
 

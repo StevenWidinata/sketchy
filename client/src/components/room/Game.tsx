@@ -4,8 +4,10 @@ import { categoryName } from "../../../../shared/words";
 import { burst } from "../../lib/confetti";
 import { chooseWord, react as sendReaction } from "../../lib/net";
 import { useGame } from "../../lib/store";
+import { useKeyboardOpen } from "../../lib/viewport";
 import { Icon } from "../Icon";
-import { Raccoon, type RaccoonMood } from "../Raccoon";
+import { InteractiveRaccoon } from "../InteractiveRaccoon";
+import type { RaccoonMood } from "../Raccoon";
 import { Board } from "./Board";
 import { Chat } from "./Chat";
 import { Avatar, PlayerList } from "./PlayerList";
@@ -24,6 +26,15 @@ export function Game({ onLeave }: { onLeave: () => void }) {
   const me = room.players.find((p) => p.id === you);
   const drawer = room.players.find((p) => p.id === room.drawerId);
   const left = useSecondsLeft(room);
+
+  // On a phone, typing a guess opens the keyboard: switch to a compact layout so the drawing stays in view.
+  const gameRef = useRef<HTMLDivElement>(null);
+  const [chatFocused, setChatFocused] = useState(false);
+  const keyboardOpen = useKeyboardOpen(gameRef);
+  const typing = chatFocused && keyboardOpen;
+  useEffect(() => {
+    if (typing) window.scrollTo(0, 0);
+  }, [typing]);
 
   // Celebrate your own correct guess.
   const stageRef = useRef<HTMLDivElement>(null);
@@ -59,7 +70,7 @@ export function Game({ onLeave }: { onLeave: () => void }) {
     room.phase === "drawing" && drawer ? `${drawer.name}'s drawing` : "Drawing canvas";
 
   return (
-    <div className="game">
+    <div className={`game${typing ? " is-typing" : ""}`} ref={gameRef}>
       <TopBar room={room} myWord={myWord} onLeave={onLeave} />
 
       <aside className="game-players" aria-label="Scoreboard">
@@ -71,7 +82,7 @@ export function Game({ onLeave }: { onLeave: () => void }) {
           <Board canDraw={isDrawer && room.phase === "drawing"} label={boardLabel} />
           <Overlay room={room} you={you} choices={choices} isDrawer={isDrawer} />
           <div className="stage-raccoon">
-            <Raccoon mood={mood} size="100%" />
+            <InteractiveRaccoon mood={mood} disabled={isDrawer && room.phase === "drawing"} />
           </div>
           {room.phase === "drawing" && !isDrawer && <Reactions room={room} />}
           {room.phase === "drawing" && isDrawer && myWord && (
@@ -103,7 +114,7 @@ export function Game({ onLeave }: { onLeave: () => void }) {
           <PlayerList room={room} you={you} />
         </div>
         <div className={`chat-wrap${tab === "chat" ? " is-on" : ""}`}>
-          <Chat placeholder={placeholder} />
+          <Chat placeholder={placeholder} onFocusChange={setChatFocused} />
         </div>
       </aside>
     </div>

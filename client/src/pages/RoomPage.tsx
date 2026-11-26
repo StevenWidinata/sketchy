@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { JoinPanel } from "../components/JoinPanel";
 import { Logo } from "../components/Logo";
-import { Raccoon } from "../components/Raccoon";
+import { InteractiveRaccoon } from "../components/InteractiveRaccoon";
 import { Game } from "../components/room/Game";
 import { Lobby } from "../components/room/Lobby";
 import { Podium } from "../components/room/Podium";
@@ -62,7 +62,7 @@ export function RoomPage({ code, navigate }: { code: string; navigate: (path: st
           </a>
         </header>
         <main className="gate-main" data-paper>
-          <Raccoon mood={status.kind === "error" ? "sad" : "wave"} size={150} />
+          <InteractiveRaccoon mood={status.kind === "error" ? "sad" : "wave"} size={150} />
           {status.kind === "gate" ? (
             <>
               <h1 className="gate-title">You're invited to room {code}</h1>
@@ -89,7 +89,7 @@ export function RoomPage({ code, navigate }: { code: string; navigate: (path: st
     return (
       <div className="gate" data-paper>
         <main className="gate-main" data-paper>
-          <Raccoon mood="sad" size={150} />
+          <InteractiveRaccoon mood="sad" size={150} />
           <h1 className="gate-title">You're no longer in room {code}</h1>
           <p className="gate-sub">You may have been away too long, or the room closed.</p>
           <div className="gate-actions">
@@ -116,7 +116,7 @@ export function RoomPage({ code, navigate }: { code: string; navigate: (path: st
     return (
       <div className="gate" data-paper>
         <main className="gate-main" aria-busy="true" data-paper>
-          <Raccoon mood="think" size={150} />
+          <InteractiveRaccoon mood="think" size={150} />
           <p className="gate-sub">Joining room {code}…</p>
         </main>
       </div>

@@ -1,6 +1,6 @@
 /** Tiny synthesized sound effects. No audio files to load. */
 
-type Sfx = "correct" | "otherCorrect" | "close" | "tick" | "turn" | "reveal" | "win" | "join" | "pop" | "scribble";
+type Sfx = "correct" | "otherCorrect" | "close" | "tick" | "turn" | "reveal" | "win" | "join" | "pop" | "scribble" | "squeak" | "boing" | "giggle" | "grumble" | "whoosh";
 
 const MUTE_KEY = "sketchy:muted";
 let ctx: AudioContext | null = null;
@@ -76,7 +76,7 @@ function glide(from: number, to: number, duration: number, type: OscillatorType 
 let noiseBuf: AudioBuffer | null = null;
 
 /** A short scratch of a felt-tip on paper: band-passed noise. */
-function scratch(duration: number, gain: number) {
+function scratch(duration: number, gain: number, freq = 2600 + Math.random() * 1400) {
   const a = audio();
   if (!a) return;
   if (!noiseBuf) {
@@ -88,7 +88,7 @@ function scratch(duration: number, gain: number) {
   src.buffer = noiseBuf;
   const band = a.createBiquadFilter();
   band.type = "bandpass";
-  band.frequency.setValueAtTime(2600 + Math.random() * 1400, a.currentTime);
+  band.frequency.setValueAtTime(freq, a.currentTime);
   band.Q.value = 1.4;
   const g = a.createGain();
   g.gain.setValueAtTime(0, a.currentTime);
@@ -135,6 +135,22 @@ export function play(sfx: Sfx) {
       break;
     case "scribble":
       scratch(0.09, 0.12);
+      break;
+    case "squeak":
+      glide(900, 1500, 0.09, "sine", 0.07);
+      break;
+    case "boing":
+      glide(160, 520, 0.18, "triangle", 0.1);
+      glide(520, 260, 0.22, "sine", 0.05);
+      break;
+    case "giggle":
+      [988, 1175, 988, 1319].forEach((f, i) => tone(f, i * 0.075, 0.07, "sine", 0.05));
+      break;
+    case "grumble":
+      glide(170, 105, 0.38, "sawtooth", 0.035);
+      break;
+    case "whoosh":
+      scratch(0.26, 0.09, 800);
       break;
   }
 }
