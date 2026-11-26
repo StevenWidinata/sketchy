@@ -6,7 +6,7 @@ export type RaccoonMood = "idle" | "think" | "cheer" | "panic" | "dance" | "wave
 const FUR = "#8e919b";
 const DARK = "#24252b";
 const LIGHT = "#ece8de";
-const INK = "#111216";
+const INK = "#1d2340";
 const TAIL = "M140 208C176 210 210 188 214 150C217 124 208 102 194 98C181 95 174 108 179 124C185 146 176 170 142 180Z";
 
 interface Props {
@@ -60,7 +60,7 @@ export function Raccoon({ mood = "idle", follow = false, size = 220, className =
       aria-hidden={label ? undefined : true}
       focusable="false"
     >
-      <ellipse cx="114" cy="236" rx="70" ry="7" fill="#000" opacity="0.35" />
+      <ellipse cx="114" cy="236" rx="70" ry="7" fill="#1d2340" opacity="0.12" />
       <g className="rc-all">
         <g className="rc-tail">
           <defs>

@@ -1,6 +1,6 @@
 /** Tiny synthesized sound effects. No audio files to load. */
 
-type Sfx = "correct" | "otherCorrect" | "close" | "tick" | "turn" | "reveal" | "win" | "join" | "pop";
+type Sfx = "correct" | "otherCorrect" | "close" | "tick" | "turn" | "reveal" | "win" | "join" | "pop" | "scribble";
 
 const MUTE_KEY = "sketchy:muted";
 let ctx: AudioContext | null = null;
@@ -73,6 +73,32 @@ function glide(from: number, to: number, duration: number, type: OscillatorType 
   osc.stop(a.currentTime + duration + 0.02);
 }
 
+let noiseBuf: AudioBuffer | null = null;
+
+/** A short scratch of a felt-tip on paper: band-passed noise. */
+function scratch(duration: number, gain: number) {
+  const a = audio();
+  if (!a) return;
+  if (!noiseBuf) {
+    noiseBuf = a.createBuffer(1, Math.ceil(a.sampleRate * 0.2), a.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  }
+  const src = a.createBufferSource();
+  src.buffer = noiseBuf;
+  const band = a.createBiquadFilter();
+  band.type = "bandpass";
+  band.frequency.setValueAtTime(2600 + Math.random() * 1400, a.currentTime);
+  band.Q.value = 1.4;
+  const g = a.createGain();
+  g.gain.setValueAtTime(0, a.currentTime);
+  g.gain.linearRampToValueAtTime(gain, a.currentTime + 0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + duration);
+  src.connect(band).connect(g).connect(a.destination);
+  src.start();
+  src.stop(a.currentTime + duration + 0.02);
+}
+
 export function play(sfx: Sfx) {
   if (muted) return;
   switch (sfx) {
@@ -106,6 +132,9 @@ export function play(sfx: Sfx) {
       break;
     case "pop":
       glide(900, 400, 0.08, "sine", 0.06);
+      break;
+    case "scribble":
+      scratch(0.09, 0.12);
       break;
   }
 }

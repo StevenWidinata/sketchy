@@ -1,9 +1,10 @@
 import type { PublicPlayer, RoomState } from "../../../../shared/types";
+import { onColor } from "../../lib/accent";
 import { Icon } from "../Icon";
 
 export function Avatar({ player, size = 36 }: { player: Pick<PublicPlayer, "name" | "color">; size?: number }) {
   return (
-    <span className="avatar" style={{ background: player.color, width: size, height: size, fontSize: size * 0.44 }} aria-hidden="true">
+    <span className="avatar" style={{ background: player.color, color: onColor(player.color), width: size, height: size, fontSize: size * 0.44 }} aria-hidden="true">
       {player.name.slice(0, 1).toUpperCase()}
     </span>
   );

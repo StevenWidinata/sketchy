@@ -5,7 +5,7 @@ export function Toasts() {
   return (
     <div className="toast-region" role="status" aria-live="polite">
       {toasts.map((t) => (
-        <div key={t.id} className="toast">
+        <div key={t.id} className="toast sketch">
           {t.message}
         </div>
       ))}

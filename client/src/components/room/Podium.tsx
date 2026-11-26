@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { CANVAS } from "../../../../shared/constants";
 import type { GalleryItem } from "../../../../shared/types";
 import { categoryName } from "../../../../shared/words";
+import { onColor } from "../../lib/accent";
 import { burst } from "../../lib/confetti";
 import { renderAll, renderUpTo, timelineLength } from "../../lib/drawing";
 import { playAgain } from "../../lib/net";
@@ -30,13 +31,13 @@ export function Podium({ onLeave }: { onLeave: () => void }) {
   }, []);
 
   return (
-    <div className="podium-page">
+    <div className="podium-page" data-paper>
       <RoomHeader onLeave={onLeave}>
         <span className="room-code-chip">Final scores</span>
       </RoomHeader>
 
-      <main className="podium-main">
-        <section className="podium-hero" aria-labelledby="podium-title">
+      <main className="podium-main" data-paper>
+        <section className="podium-hero" aria-labelledby="podium-title" data-paper>
           <h1 id="podium-title" className="podium-title">
             {first ? (tie ? "It's a tie at the top" : `${first.name} wins`) : "Game over"}
           </h1>
@@ -51,7 +52,11 @@ export function Podium({ onLeave }: { onLeave: () => void }) {
                     <Avatar player={p} size={[48, 64, 44][i]} />
                     <span className="podium-name">{p.name}</span>
                     <span className="podium-score tabular">{fmt.format(p.score)}</span>
-                    <span className="podium-block" aria-hidden="true">
+                    <span
+                      className={`podium-block sketch${i === 1 ? "" : " sketch-alt"}`}
+                      aria-hidden="true"
+                      style={i === 1 ? { ["--block" as string]: p.color, ["--on-block" as string]: onColor(p.color) } : undefined}
+                    >
                       {[2, 1, 3][i]}
                     </span>
                     <span className="visually-hidden">Place {[2, 1, 3][i]}</span>
@@ -88,14 +93,14 @@ export function Podium({ onLeave }: { onLeave: () => void }) {
         </section>
 
         {gallery.length > 0 && (
-          <section className="gallery" aria-labelledby="gallery-title">
+          <section className="gallery" aria-labelledby="gallery-title" data-paper>
             <h2 id="gallery-title" className="section-title section-title-sm">
               Drawings from this game
             </h2>
             <ul className="gallery-grid">
-              {gallery.map((g) => (
+              {gallery.map((g, i) => (
                 <li key={g.id}>
-                  <button type="button" className="gallery-item" onClick={() => setOpen(g)}>
+                  <button type="button" className={`gallery-item sketch${i % 2 ? " sketch-alt" : ""}`} onClick={() => setOpen(g)}>
                     <Thumb item={g} />
                     <span className="gallery-word">{g.word}</span>
                     <span className="gallery-meta">Drawn by {g.drawerName}</span>

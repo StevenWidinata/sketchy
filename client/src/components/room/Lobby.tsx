@@ -56,15 +56,15 @@ export function Lobby({ onLeave }: { onLeave: () => void }) {
         : null;
 
   return (
-    <div className="lobby">
+    <div className="lobby" data-paper>
       <RoomHeader onLeave={onLeave}>
         <span className="room-code-chip">
           Room <strong translate="no">{room.code}</strong>
         </span>
       </RoomHeader>
 
-      <main className="lobby-main">
-        <section className="lobby-side" aria-labelledby={`${ids}-invite`}>
+      <main className="lobby-main" data-paper>
+        <section className="lobby-side" aria-labelledby={`${ids}-invite`} data-paper>
           <div className="invite">
             <div className="invite-text">
               <h1 id={`${ids}-invite`} className="lobby-title">
@@ -89,7 +89,7 @@ export function Lobby({ onLeave }: { onLeave: () => void }) {
             )}
           </div>
 
-          <div className="lobby-players">
+          <div className="lobby-players" data-paper>
             <h2 className="panel-title">
               Players <span className="panel-count tabular">{room.players.length} of {s.maxPlayers}</span>
             </h2>
@@ -97,7 +97,7 @@ export function Lobby({ onLeave }: { onLeave: () => void }) {
           </div>
         </section>
 
-        <section className="lobby-settings" aria-labelledby={`${ids}-settings`}>
+        <section className="lobby-settings sketch" aria-labelledby={`${ids}-settings`}>
           <h2 id={`${ids}-settings`} className="panel-title">
             Game settings
             {!isHost && <span className="panel-note">Only {host?.name ?? "the host"} can change these</span>}

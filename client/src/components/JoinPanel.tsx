@@ -1,8 +1,20 @@
-import { useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useState, type FormEvent } from "react";
 import { AVATAR_COLORS, LIMITS } from "../../../shared/constants";
+import { applyAccent } from "../lib/accent";
 import { loadProfile, saveProfile } from "../lib/profile";
 import { unlockAudio } from "../lib/sound";
 import { createRoom, joinRoom } from "../lib/net";
+
+const COLOR_NAMES: Record<string, string> = {
+  "#d4ff3f": "Lime",
+  "#ff8a3d": "Orange",
+  "#3fa9f5": "Blue",
+  "#f472b6": "Pink",
+  "#ffd23f": "Yellow",
+  "#3fbf5f": "Green",
+  "#8b5cf6": "Violet",
+  "#e5372f": "Red",
+};
 
 interface Props {
   navigate: (path: string) => void;
@@ -54,7 +66,7 @@ export function ProfileFields({
         <div className="swatches">
           {AVATAR_COLORS.map((c) => (
             <label key={c} className="swatch" style={{ ["--c" as string]: c }}>
-              <input type="radio" name={`${id}-color`} value={c} checked={color === c} onChange={() => onColor(c)} aria-label={`Color ${c}`} />
+              <input type="radio" name={`${id}-color`} value={c} checked={color === c} onChange={() => onColor(c)} aria-label={COLOR_NAMES[c] ?? c} />
               <span />
             </label>
           ))}
@@ -65,9 +77,11 @@ export function ProfileFields({
 }
 
 export function JoinPanel({ navigate, code: fixedCode }: Props) {
-  const initial = loadProfile();
+  const [initial] = useState(loadProfile);
   const [name, setName] = useState(initial.name);
   const [color, setColor] = useState(initial.color);
+  // The whole page takes on the color you pick, live.
+  useEffect(() => applyAccent(color), [color]);
   const [code, setCode] = useState(fixedCode ?? "");
   const [busy, setBusy] = useState<"create" | "join" | null>(null);
   const [nameError, setNameError] = useState<string>();
@@ -121,7 +135,7 @@ export function JoinPanel({ navigate, code: fixedCode }: Props) {
   };
 
   return (
-    <div className="join-panel">
+    <div className="join-panel sketch">
       <ProfileFields name={name} color={color} onName={setName} onColor={setColor} nameError={nameError} />
 
       {fixedCode ? (

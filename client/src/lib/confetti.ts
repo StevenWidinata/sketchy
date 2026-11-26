@@ -1,4 +1,4 @@
-const COLORS = ["#d4ff3f", "#ff8a3d", "#3fa9f5", "#f472b6", "#ffd23f", "#f4f1ea"];
+const COLORS = ["#d4ff3f", "#ff8a3d", "#3fa9f5", "#f472b6", "#ffd23f", "#8b5cf6", "#3fbf5f", "#1d2340"];
 
 /** One-shot confetti burst from a point on screen. Does nothing with reduced motion. */
 export function burst(x = window.innerWidth / 2, y = window.innerHeight / 3, count = 90) {

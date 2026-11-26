@@ -118,12 +118,12 @@ function Overlay({ room, you, choices, isDrawer }: { room: RoomState; you: strin
     if (isDrawer && choices) {
       return (
         <div className="overlay">
-          <div className="overlay-card picker">
+          <div className="overlay-card picker sketch">
             <h2 className="overlay-title">Your turn. Pick a word to draw</h2>
             <ul className="picker-list">
               {choices.map((c, i) => (
                 <li key={c.word} style={{ animationDelay: `${i * 90}ms` }}>
-                  <button type="button" className="pick" onClick={() => void chooseWord(i)}>
+                  <button type="button" className={`pick sketch${i % 2 ? " sketch-alt" : ""}`} onClick={() => void chooseWord(i)}>
                     <span className="pick-cat">{categoryName(c.categoryId, lang)}</span>
                     <span className="pick-word">{c.word}</span>
                   </button>
@@ -137,7 +137,7 @@ function Overlay({ room, you, choices, isDrawer }: { room: RoomState; you: strin
     }
     return (
       <div className="overlay">
-        <div className="overlay-card waiting">
+        <div className="overlay-card waiting sketch">
           {drawer && <Avatar player={drawer} size={48} />}
           <h2 className="overlay-title">{drawer?.name ?? "Someone"} is picking a word</h2>
           <p className="overlay-foot">Get your guessing fingers ready.</p>
@@ -156,7 +156,7 @@ function Overlay({ room, you, choices, isDrawer }: { room: RoomState; you: strin
           : "Time's up";
     return (
       <div className="overlay">
-        <div className="overlay-card reveal">
+        <div className="overlay-card reveal sketch">
           <p className="reveal-reason">{reason}</p>
           {room.revealWord ? (
             <>

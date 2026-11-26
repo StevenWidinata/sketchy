@@ -1,13 +1,12 @@
-html,
-body {
-  background: var(--bg);
-  color: var(--text);
-}
-
 html {
-  color-scheme: dark;
+  color-scheme: light;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
+  background-color: var(--bg);
+  /* Sketchbook dot grid: a pattern, not a color wash */
+  background-image: radial-gradient(circle at 2px 2px, var(--dot) 1.3px, transparent 1.9px);
+  background-size: 24px 24px;
+  color: var(--text);
 }
 
 @media (pointer: fine) {
@@ -30,6 +29,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   touch-action: manipulation;
+}
+
+#root {
+  isolation: isolate;
 }
 
 h1,
@@ -70,13 +73,21 @@ a {
 }
 
 :focus-visible {
-  outline: 2px solid var(--lime);
+  outline: 2px solid var(--accent-ink);
   outline-offset: 2px;
 }
 
 ::selection {
-  background: var(--lime);
-  color: var(--on-lime);
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+/* While you doodle on the paper, a drag must not select text. */
+.is-doodling,
+.is-doodling * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  cursor: crosshair;
 }
 
 .visually-hidden {
@@ -97,8 +108,9 @@ a {
   top: -48px;
   z-index: 100;
   padding: var(--space-2) var(--space-3);
-  background: var(--lime);
-  color: var(--on-lime);
+  background: var(--surface-1);
+  color: var(--text);
+  border: 2px solid var(--outline);
   border-radius: var(--r-control);
   font-weight: 600;
   text-decoration: none;
@@ -114,8 +126,39 @@ a {
   font-weight: 600;
 }
 
+.display {
+  font-family: var(--font-display);
+}
+
 .tabular {
   font-variant-numeric: tabular-nums;
+}
+
+/* ---------- the signature: a hand-drawn ink outline ---------- */
+/* A layer under the content draws the ink border and its offset shadow.
+   Only that layer goes through the wobble filter, so text stays crisp. */
+
+.sketch,
+.btn-primary {
+  position: relative;
+  isolation: isolate;
+}
+
+.sketch::before,
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 2px solid var(--outline);
+  border-radius: inherit;
+  box-shadow: 3px 3px 0 var(--outline);
+  filter: url(#sketch-wobble);
+  pointer-events: none;
+}
+
+.sketch-alt::before {
+  filter: url(#sketch-wobble-alt);
 }
 
 /* ---------- buttons ---------- */
@@ -149,27 +192,43 @@ a {
 }
 
 .btn-primary {
-  background: var(--lime);
-  color: var(--on-lime);
+  border: 0;
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--lime-press);
+  background: color-mix(in srgb, var(--accent) 88%, #1d2340);
+}
+
+/* Pressing pushes the button into its shadow, like a real stamp. */
+.btn-primary:active:not(:disabled) {
+  transform: translate(2px, 2px);
+}
+
+.btn-primary:active:not(:disabled)::before {
+  box-shadow: 1px 1px 0 var(--outline);
 }
 
 .btn-primary:disabled {
-  background: var(--surface-3);
+  background: var(--surface-2);
   color: var(--text-3);
 }
 
+.btn-primary:disabled::before {
+  border-color: var(--line-strong);
+  box-shadow: none;
+}
+
 .btn-secondary {
-  background: var(--surface-2);
+  background: var(--surface-1);
   border-color: var(--line-strong);
   color: var(--text);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: var(--surface-3);
+  background: var(--surface-2);
+  border-color: rgba(29, 35, 64, 0.32);
 }
 
 .btn-ghost {
@@ -191,8 +250,8 @@ a {
 .icon-btn {
   display: inline-grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border: 1px solid transparent;
   border-radius: var(--r-control);
   background: transparent;
@@ -244,26 +303,31 @@ fieldset.field legend {
   padding: 0 var(--space-4);
   border-radius: var(--r-control);
   border: 1px solid var(--line-strong);
-  background: var(--ink-0);
+  background: var(--surface-1);
   color: var(--text);
   font-size: 16px;
   transition:
     border-color var(--t-fast) var(--ease),
-    background-color var(--t-fast) var(--ease);
+    box-shadow var(--t-fast) var(--ease);
 }
 
 .input::placeholder {
   color: var(--text-3);
 }
 
-.input:hover {
-  border-color: rgba(244, 241, 234, 0.22);
+.input:hover:not(:disabled) {
+  border-color: rgba(29, 35, 64, 0.34);
 }
 
 .input:focus-visible {
   outline: none;
-  border-color: var(--lime);
-  box-shadow: 0 0 0 1px var(--lime);
+  border-color: var(--accent-ink);
+  box-shadow: 0 0 0 1px var(--accent-ink);
+}
+
+.input:disabled {
+  background: var(--surface-2);
+  color: var(--text-2);
 }
 
 .input-code {
@@ -280,11 +344,9 @@ fieldset.field legend {
 }
 
 select.input {
-  background-color: var(--ink-0);
-  color: var(--text);
   padding-right: var(--space-8);
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23b3b0a8' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%234a5070' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
 }
@@ -293,7 +355,7 @@ select.input {
 .swatches {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--space-1);
   margin: 0;
   padding: 0;
   border: 0;
@@ -301,8 +363,10 @@ select.input {
 
 .swatch {
   position: relative;
-  width: 30px;
-  height: 30px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
 }
 
 .swatch input {
@@ -315,19 +379,22 @@ select.input {
 
 .swatch span {
   display: block;
-  width: 100%;
-  height: 100%;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: var(--c);
-  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.25);
-  transition: transform var(--t-fast) var(--ease);
+  box-shadow: inset 0 0 0 1.5px rgba(29, 35, 64, 0.22);
+  transition:
+    transform var(--t-fast) var(--ease),
+    box-shadow var(--t-fast) var(--ease);
   pointer-events: none;
 }
 
 .swatch input:checked + span {
   box-shadow:
-    0 0 0 2px var(--bg),
-    0 0 0 4px var(--text);
+    inset 0 0 0 1.5px rgba(29, 35, 64, 0.22),
+    0 0 0 3px var(--surface-1),
+    0 0 0 5px var(--outline);
 }
 
 .swatch input:hover + span {
@@ -335,12 +402,27 @@ select.input {
 }
 
 .swatch input:focus-visible + span {
-  box-shadow:
-    0 0 0 2px var(--bg),
-    0 0 0 4px var(--lime);
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 6px;
 }
 
-/* The signature: a lime highlighter swipe behind the active thing */
+@media (max-width: 400px) {
+  .swatch {
+    width: 36px;
+    height: 36px;
+  }
+
+  .swatch span {
+    width: 28px;
+    height: 28px;
+  }
+
+  .swatches {
+    gap: 2px;
+  }
+}
+
+/* A green highlighter swipe behind a correct guess */
 .swipe {
   position: relative;
   isolation: isolate;
@@ -349,14 +431,26 @@ select.input {
 .swipe::before {
   content: "";
   position: absolute;
-  inset: -2px -6px;
+  inset: -1px -5px;
   z-index: -1;
-  background: var(--lime);
+  background: var(--good-mark);
   clip-path: polygon(1% 18%, 97% 4%, 100% 80%, 3% 96%);
   border-radius: 3px;
 }
 
-/* Toasts */
+/* ---------- scribble background ---------- */
+
+.scribble-field {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ---------- toasts ---------- */
+
 .toast-region {
   position: fixed;
   left: 50%;
@@ -364,7 +458,7 @@ select.input {
   transform: translateX(-50%);
   z-index: 80;
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-3);
   width: min(92vw, 440px);
   pointer-events: none;
 }
@@ -372,11 +466,9 @@ select.input {
 .toast {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--r-control);
-  background: var(--surface-3);
-  border: 1px solid var(--line-strong);
+  background: var(--surface-1);
   color: var(--text);
   font-size: 15px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   animation: toast-in var(--t-mid) var(--ease);
 }
 

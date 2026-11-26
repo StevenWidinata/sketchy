@@ -154,20 +154,22 @@ export function Board({ canDraw, label }: { canDraw: boolean; label: string }) {
 
   return (
     <div className={`board${canDraw ? " can-draw" : ""}`}>
-      <div className="paper">
-        <canvas
-          ref={canvasRef}
-          width={CANVAS.width}
-          height={CANVAS.height}
-          className={`canvas tool-${tool}`}
-          role="img"
-          aria-label={label}
-        />
-        {canDraw && <div ref={cursorRef} className={`brush-cursor${tool === "eraser" ? " is-eraser" : ""}`} aria-hidden="true" />}
+      <div className="paper-frame sketch">
+        <div className="paper">
+          <canvas
+            ref={canvasRef}
+            width={CANVAS.width}
+            height={CANVAS.height}
+            className={`canvas tool-${tool}`}
+            role="img"
+            aria-label={label}
+          />
+          {canDraw && <div ref={cursorRef} className={`brush-cursor${tool === "eraser" ? " is-eraser" : ""}`} aria-hidden="true" />}
+        </div>
       </div>
 
       {canDraw && (
-        <div className="toolbar" role="toolbar" aria-label="Drawing tools">
+        <div className="toolbar sketch sketch-alt" role="toolbar" aria-label="Drawing tools">
           <div className="tool-group" role="radiogroup" aria-label="Tool">
             {(
               [

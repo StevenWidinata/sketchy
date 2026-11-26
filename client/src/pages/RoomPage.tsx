@@ -5,7 +5,9 @@ import { Raccoon } from "../components/Raccoon";
 import { Game } from "../components/room/Game";
 import { Lobby } from "../components/room/Lobby";
 import { Podium } from "../components/room/Podium";
+import { applyAccent } from "../lib/accent";
 import { loadProfile } from "../lib/profile";
+import { useScribbles } from "../lib/scribbles";
 import { joinRoom, leaveRoom } from "../lib/net";
 import { useGame } from "../lib/store";
 import "../styles/room.css";
@@ -15,11 +17,20 @@ type Status = { kind: "joining" } | { kind: "gate" } | { kind: "error"; message:
 export function RoomPage({ code, navigate }: { code: string; navigate: (path: string) => void }) {
   const room = useGame((s) => s.room);
   const connected = useGame((s) => s.connected);
+  const you = useGame((s) => s.you);
   const [status, setStatus] = useState<Status>(() => {
     if (room?.code === code) return { kind: "ready" };
     return loadProfile().name ? { kind: "joining" } : { kind: "gate" };
   });
   const started = useRef(false);
+
+  // Busy paper everywhere except during a turn, when the doodles step back.
+  const scene = status.kind !== "ready" || !room ? "gate" : room.phase === "lobby" ? "lobby" : room.phase === "podium" ? "podium" : "game";
+  useScribbles(scene === "game" ? "calm" : "full", `room:${scene}`);
+
+  // In a room, the accent is your own player color.
+  const myColor = room?.players.find((p) => p.id === you)?.color;
+  useEffect(() => applyAccent(myColor ?? loadProfile().color), [myColor]);
 
   useEffect(() => {
     if (status.kind !== "joining" || started.current) return;
@@ -44,13 +55,13 @@ export function RoomPage({ code, navigate }: { code: string; navigate: (path: st
 
   if (status.kind === "gate" || status.kind === "error") {
     return (
-      <div className="gate">
-        <header className="gate-head">
+      <div className="gate" data-paper>
+        <header className="gate-head" data-paper>
           <a href="/" className="logo-link" aria-label="Sketchy home">
             <Logo />
           </a>
         </header>
-        <main className="gate-main">
+        <main className="gate-main" data-paper>
           <Raccoon mood={status.kind === "error" ? "sad" : "wave"} size={150} />
           {status.kind === "gate" ? (
             <>
@@ -76,8 +87,8 @@ export function RoomPage({ code, navigate }: { code: string; navigate: (path: st
 
   if (status.kind === "ready" && !room) {
     return (
-      <div className="gate">
-        <main className="gate-main">
+      <div className="gate" data-paper>
+        <main className="gate-main" data-paper>
           <Raccoon mood="sad" size={150} />
           <h1 className="gate-title">You're no longer in room {code}</h1>
           <p className="gate-sub">You may have been away too long, or the room closed.</p>
@@ -103,8 +114,8 @@ export function RoomPage({ code, navigate }: { code: string; navigate: (path: st
 
   if (status.kind === "joining" || !room) {
     return (
-      <div className="gate">
-        <main className="gate-main" aria-busy="true">
+      <div className="gate" data-paper>
+        <main className="gate-main" aria-busy="true" data-paper>
           <Raccoon mood="think" size={150} />
           <p className="gate-sub">Joining room {code}…</p>
         </main>

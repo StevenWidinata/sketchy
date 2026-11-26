@@ -1,30 +1,42 @@
 :root {
-  /* Ink ramp: neutral with a faint cool tint, like marker ink on a night desk */
-  --ink-0: #0c0d10;
-  --bg: #111216;
-  --surface-1: #17181d;
-  --surface-2: #1d1e24;
-  --surface-3: #25262d;
-  --line: rgba(244, 241, 234, 0.08);
-  --line-strong: rgba(244, 241, 234, 0.14);
+  /* Paper and ink: a white sketchbook page with ballpoint-blue dots and navy marker ink */
+  --bg: #fefdfb;
+  --dot: #c5cde0;
+  --surface-1: #ffffff;
+  --surface-2: #f3f4f8;
+  --surface-3: #e7e9f0;
+  --line: rgba(29, 35, 64, 0.1);
+  --line-strong: rgba(29, 35, 64, 0.2);
 
-  --text: #f4f1ea;
-  --text-2: #b3b0a8;
-  --text-3: #7f7d77;
+  --text: #1d2340;
+  --text-2: #4a5070;
+  --text-3: #646a84;
 
-  --paper: #f4f1ea;
-  --paper-canvas: #fbf9f4;
-  --paper-ink: #16171c;
-  --paper-ink-2: #5c5a55;
+  /* The outline ink of hand-drawn panels and buttons */
+  --outline: #1d2340;
 
-  --lime: #d4ff3f;
-  --lime-press: #c2ee2c;
-  --on-lime: #16171c;
-  --coral: #ff5a4e;
-  --coral-soft: rgba(255, 90, 78, 0.14);
-  --lime-soft: rgba(212, 255, 63, 0.12);
+  /* The drawing surface stays plain white */
+  --paper: #ffffff;
+  --paper-canvas: #ffffff;
+  --paper-ink: #1d2340;
+  --paper-ink-2: #4a5070;
+
+  /* Your own player color. lib/accent.ts rewrites these from the color you pick. */
+  --accent: #3fa9f5;
+  --on-accent: #1d2340;
+  --accent-ink: #1f6fb0;
+  --accent-soft: color-mix(in srgb, var(--accent) 22%, #ffffff);
+
+  /* Meaning only: a correct guess, an error */
+  --good: #1d7a45;
+  --good-mark: #c9efb0;
+  --good-soft: #e9f7e6;
+  --bad: #c3352c;
+  --on-bad: #ffffff;
+  --bad-soft: #fbe9e7;
 
   --font-ui: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "DynaPuff Variable", "Bricolage Grotesque Variable", ui-rounded, system-ui, sans-serif;
   --font-hand: "Caveat", "Comic Sans MS", cursive;
 
   --r-control: 10px;

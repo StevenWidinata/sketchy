@@ -1,7 +1,7 @@
 import { CANVAS } from "../../../shared/constants";
 import type { DrawAction } from "../../../shared/types";
 
-export const CANVAS_BG = "#fbf9f4";
+export const CANVAS_BG = "#ffffff";
 
 type Stroke = Extract<DrawAction, { kind: "stroke" }>;
 

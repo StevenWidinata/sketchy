@@ -137,10 +137,10 @@ export function Carousel() {
 
   return (
     <div className="carousel">
-      <div className="carousel-stage" ref={stageRef}>
+      <div className="carousel-stage" ref={stageRef} data-clear>
         <ul className="carousel-track" aria-label="Example rounds">
           {cards.map((c, i) => (
-            <li key={i} className="doodle-card" ref={(el) => void (cardRefs.current[i] = el)} aria-hidden={i >= CARDS.length}>
+            <li key={i} className={`doodle-card sketch${i % 2 ? " sketch-alt" : ""}`} ref={(el) => void (cardRefs.current[i] = el)} aria-hidden={i >= CARDS.length}>
               <span className="doodle-card-cat">{c.category}</span>
               <Doodle name={c.doodle} delay={600 + (i % CARDS.length) * 140} />
               <div className="doodle-card-chat">
