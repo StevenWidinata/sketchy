@@ -143,6 +143,47 @@ describe("Game", () => {
     expect(state().turnId).toBe(2);
   });
 
+  it("runs a Speed round: 30 s turns with hints at a third and two thirds", () => {
+    const { game, join, state, tick, now } = setup();
+    const a = join("Rina");
+    join("Bayu");
+    game.updateSettings(a, { mode: "speed", drawTime: 120, customWords: ["watermelon", "pineapple", "chocolate"], customOnly: true });
+    expect(state().settings.mode).toBe("speed");
+    game.start(a, now());
+    game.choose(a, 0, now());
+    expect(state().phaseEndsAt! - now()).toBe(30_000);
+    const shown = () => state().hint!.pattern.filter((ch) => ch !== "_" && ch !== " " && ch !== "-").length;
+    tick(11_000);
+    expect(shown()).toBe(1);
+    tick(10_000);
+    expect(shown()).toBe(2);
+    tick(10_000);
+    expect(state().phase).toBe("reveal");
+    expect(state().endReason).toBe("time-up");
+  });
+
+  it("offers easy, medium and hard words and pays more for the hard one", () => {
+    const { game, join, state, now } = setup();
+    const a = join("Rina");
+    const b = join("Bayu");
+    game.updateSettings(a, { categories: ["animals"] });
+    game.start(a, now());
+    expect(game.privateFor(a).choices!.map((c) => c.difficulty)).toEqual(["easy", "medium", "hard"]);
+    game.choose(a, 2, now());
+    game.chat(b, game.data.word!.word, now());
+    game.advance(now());
+    expect(state().phase).toBe("reveal");
+    expect(state().revealDifficulty).toBe("hard");
+    expect(state().players.find((p) => p.id === a)!.score).toBe(450);
+  });
+
+  it("treats rooms saved before Speed rounds as classic", () => {
+    const { game, join, state } = setup();
+    join("Rina");
+    delete (game.data.settings as Partial<typeof game.data.settings>).mode;
+    expect(state().settings.mode).toBe("classic");
+  });
+
   it("catches up on several deadlines in one request", () => {
     const { game, join, state, now } = setup();
     const a = join("Rina");

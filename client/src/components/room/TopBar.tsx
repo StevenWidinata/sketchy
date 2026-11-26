@@ -91,6 +91,7 @@ export function TopBar({ room, myWord, onLeave }: { room: RoomState; myWord: Wor
         </span>
         <span className="round tabular">
           Round {room.round} of {room.settings.rounds}
+          {room.settings.mode === "speed" && <span className="round-mode">Speed round</span>}
         </span>
       </div>
       <div className="topbar-mid">

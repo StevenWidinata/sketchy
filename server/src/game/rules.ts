@@ -1,4 +1,5 @@
 import { LIMITS, SCORING } from "../../../shared/constants.js";
+import type { Difficulty } from "../../../shared/types.js";
 
 /** Lowercase, strip accents and punctuation, treat hyphens as spaces, collapse whitespace. */
 export function normalize(text: string): string {
@@ -51,6 +52,11 @@ export function guessPoints(secondsLeft: number, duration: number, order: number
 export function drawerPoints(guessed: number, eligible: number): number {
   if (eligible <= 0 || guessed <= 0) return 0;
   return Math.round(SCORING.drawerMax * Math.min(1, guessed / eligible));
+}
+
+/** Harder words are worth more, for the guessers and the drawer alike. Custom words play as medium. */
+export function difficultyBonus(level: Difficulty | undefined): number {
+  return level === "hard" ? 1.5 : level === "easy" ? 1 : 1.25;
 }
 
 const SEPARATORS = new Set([" ", "-"]);

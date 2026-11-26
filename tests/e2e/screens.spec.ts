@@ -50,6 +50,7 @@ test("screens", async ({ browser }) => {
   await expect(host.getByText("Mei").first()).toBeVisible();
 
   await host.getByRole("radiogroup", { name: "Rounds" }).getByRole("radio", { name: "2" }).click();
+  await host.getByRole("radiogroup", { name: "Mode" }).getByRole("radio", { name: "Speed round" }).click();
   await host.waitForTimeout(800);
   await host.screenshot({ path: out("lobby-desktop") });
   await phone.screenshot({ path: out("lobby-phone"), fullPage: true });

@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from "react";
-import { LIMITS, SETTING_OPTIONS } from "../../../../shared/constants";
+import { LIMITS, SETTING_OPTIONS, TIMING } from "../../../../shared/constants";
 import type { Settings } from "../../../../shared/types";
 import { CATEGORIES, DEFAULT_CATEGORY_IDS } from "../../../../shared/words";
 
@@ -126,15 +126,30 @@ export function Lobby({ onLeave }: { onLeave: () => void }) {
               <Segmented label="Rounds" options={SETTING_OPTIONS.rounds} value={s.rounds} onChange={(v) => update({ rounds: v })} disabled={!isHost} />
             </div>
             <div className="setting">
-              <span className="setting-label">Draw time</span>
+              <span className="setting-label">Mode</span>
               <Segmented
-                label="Draw time"
-                options={SETTING_OPTIONS.drawTime}
-                value={s.drawTime}
-                format={(v) => `${v}s`}
-                onChange={(v) => update({ drawTime: v })}
+                label="Mode"
+                options={["classic", "speed"] as const}
+                value={s.mode}
+                format={(v) => (v === "classic" ? "Classic" : "Speed round")}
+                onChange={(v) => update({ mode: v })}
                 disabled={!isHost}
               />
+            </div>
+            <div className="setting">
+              <span className="setting-label">Draw time</span>
+              {s.mode === "speed" ? (
+                <p className="setting-fixed">{TIMING.speedSeconds} s per turn, letter hints come sooner</p>
+              ) : (
+                <Segmented
+                  label="Draw time"
+                  options={SETTING_OPTIONS.drawTime}
+                  value={s.drawTime}
+                  format={(v) => `${v}s`}
+                  onChange={(v) => update({ drawTime: v })}
+                  disabled={!isHost}
+                />
+              )}
             </div>
             <div className="setting">
               <span className="setting-label">Words to pick from</span>

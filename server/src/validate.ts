@@ -49,6 +49,7 @@ const settingsSchema = z
     categories: z.array(z.string().max(32)).max(40),
     customWords: z.array(z.string().max(64)).max(LIMITS.customWordsMax * 2),
     customOnly: z.boolean(),
+    mode: z.enum(["classic", "speed"]),
   })
   .partial()
   .strict();

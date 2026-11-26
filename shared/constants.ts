@@ -19,6 +19,8 @@ export const LIMITS = {
 export const TIMING = {
   chooseSeconds: 15,
   revealSeconds: 6,
+  /** Length of every turn in a Speed round. */
+  speedSeconds: 30,
   reconnectGraceSeconds: 30,
 } as const;
 
@@ -37,6 +39,7 @@ export const DEFAULT_SETTINGS = {
   categories: [] as string[], // empty = all categories
   customWords: [] as string[],
   customOnly: false,
+  mode: "classic",
 } as const;
 
 /** The drawing surface always has this internal size, on every device, so fills replay identically. */

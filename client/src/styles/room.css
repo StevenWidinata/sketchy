@@ -2024,3 +2024,115 @@
 .stage-raccoon .rc-btn:not(.is-off) {
   pointer-events: auto;
 }
+
+/* ---------- word difficulty ---------- */
+
+.pick-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space-1);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--paper-ink-2);
+}
+
+.pick-level svg path {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.pick-level svg path.is-on {
+  stroke: currentColor;
+}
+
+.pick-bonus {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+.pick:hover .pick-level,
+.pick:hover .pick-bonus {
+  color: inherit;
+}
+
+.pick:hover .pick-level svg path:not(.is-on) {
+  stroke: currentColor;
+  opacity: 0.3;
+}
+
+.reveal-level {
+  margin-top: calc(var(--space-2) * -1);
+  color: var(--text-2);
+  font-size: 14px;
+}
+
+/* ---------- speed round ---------- */
+
+.setting-fixed {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  color: var(--text-2);
+  font-size: 14px;
+}
+
+.round-mode {
+  margin-left: var(--space-2);
+  padding: 2px var(--space-2);
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media (max-width: 960px) {
+  /* Level sits on the category line so three picks fit inside the canvas. */
+  .picker-list {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+
+  .pick {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--space-3);
+    row-gap: 2px;
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .pick-cat {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .pick-word {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+
+  .pick-level {
+    grid-row: 1;
+    grid-column: 2;
+    margin-top: 0;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 520px) {
+  .round:has(.round-mode) {
+    display: grid;
+    justify-items: start;
+    gap: 2px;
+    font-size: 12px;
+  }
+
+  .round-mode {
+    margin-left: 0;
+    padding: 0 6px;
+    font-size: 12px;
+  }
+}

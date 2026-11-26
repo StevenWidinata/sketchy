@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { DEFAULT_SETTINGS, LIMITS, SETTING_OPTIONS, TIMING } from "../../../shared/constants.js";
 import type { ChatLine, Phase, PublicPlayer, RoomState, Settings, WordChoice } from "../../../shared/types.js";
 import { CATEGORY_IDS } from "../../../shared/words.js";
-import { checkGuess, cleanCustomWords, cleanText, drawerPoints, guessPoints, hintOrder, revealPattern } from "./rules.js";
+import { checkGuess, cleanCustomWords, cleanText, difficultyBonus, drawerPoints, guessPoints, hintOrder, revealPattern } from "./rules.js";
 import { pickChoices } from "./wordPool.js";
 
 /** A player counts as away after this long without a request or heartbeat. */
@@ -204,6 +204,7 @@ export class Game {
     if (patch.categories) s.categories = [...new Set(patch.categories.filter((c) => CATEGORY_IDS.includes(c)))];
     if (patch.customWords) s.customWords = cleanCustomWords(patch.customWords);
     if (patch.customOnly !== undefined) s.customOnly = !!patch.customOnly;
+    if (patch.mode === "classic" || patch.mode === "speed") s.mode = patch.mode;
     this.data.settings = s;
     return OK;
   }
@@ -293,7 +294,7 @@ export class Game {
     const picks = pickChoices(d.settings, d.settings.wordChoices, d.usedWords, this.rng);
     const shown = new Set(picks.map((w) => w.key));
     d.usedWords = [...d.usedWords.filter((k) => !shown.has(k)), ...shown];
-    d.choices = picks.map(({ word, categoryId }) => ({ word, categoryId }));
+    d.choices = picks.map(({ word, categoryId, difficulty }) => ({ word, categoryId, difficulty }));
     this.setPhase("choosing", at, TIMING.chooseSeconds);
   }
 
@@ -304,7 +305,7 @@ export class Game {
     if (!pick) return fail("Pick one of the words shown.");
     d.word = pick;
     d.hintPositions = hintOrder(pick.word, this.rng);
-    this.setPhase("drawing", now, d.settings.drawTime);
+    this.setPhase("drawing", now, d.settings.mode === "speed" ? TIMING.speedSeconds : d.settings.drawTime);
     return OK;
   }
 
@@ -312,7 +313,9 @@ export class Game {
   hintTimes(): number[] {
     const d = this.data;
     if (d.phase !== "drawing" || d.phaseStartedAt === null) return [];
-    return d.hintPositions.map((_, i) => d.phaseStartedAt! + d.phaseDuration * 1000 * (0.5 + 0.25 * i));
+    // Classic reveals letters at 50% and 75% of the turn; a Speed round at 33% and 66%.
+    const at = d.settings.mode === "speed" ? [1 / 3, 2 / 3] : [0.5, 0.75];
+    return d.hintPositions.map((_, i) => d.phaseStartedAt! + d.phaseDuration * 1000 * at[i]);
   }
 
   private endTurn(reason: NonNullable<RoomState["endReason"]>, at: number) {
@@ -320,7 +323,7 @@ export class Game {
     const drawer = this.player(d.drawerId);
     if (drawer && d.word && reason !== "drawer-left") {
       const eligible = d.players.filter((p) => p.id !== drawer.id && (p.guessed || this.isConnected(p, at))).length;
-      const gain = drawerPoints(d.solvedCount, eligible);
+      const gain = Math.round(drawerPoints(d.solvedCount, eligible) * difficultyBonus(d.word.difficulty));
       drawer.score += gain;
       drawer.gain = gain;
     }
@@ -434,7 +437,7 @@ export class Game {
   private correctGuess(p: PlayerData, now: number) {
     const d = this.data;
     const secondsLeft = d.phaseEndsAt ? (d.phaseEndsAt - now) / 1000 : 0;
-    const gain = guessPoints(secondsLeft, d.phaseDuration, d.solvedCount);
+    const gain = Math.round(guessPoints(secondsLeft, d.phaseDuration, d.solvedCount) * difficultyBonus(d.word?.difficulty));
     d.solvedCount++;
     p.guessed = true;
     p.gain = gain;
@@ -484,7 +487,8 @@ export class Game {
       rev,
       turnId: d.turnId,
       phase: d.phase,
-      settings: d.settings,
+      // Rooms saved before Speed rounds existed have no mode.
+      settings: { ...d.settings, mode: d.settings.mode ?? "classic" },
       players,
       hostId: d.hostId,
       round: d.round,
@@ -495,6 +499,7 @@ export class Game {
       serverNow: now,
       hint: showHint ? { categoryId: d.word!.categoryId, pattern: revealPattern(d.word!.word, d.hintPositions.slice(0, shown)) } : null,
       revealWord: d.phase === "reveal" ? (d.word?.word ?? null) : null,
+      revealDifficulty: d.phase === "reveal" && d.word ? (d.word.difficulty ?? null) : null,
       reactions: { likes: d.likes.length, dislikes: d.dislikes.length },
       endReason: d.phase === "reveal" ? d.endReason : null,
     };

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { RoomState, WordChoice } from "../../../../shared/types";
+import type { Difficulty, RoomState, WordChoice } from "../../../../shared/types";
 import { categoryName } from "../../../../shared/words";
 import { burst } from "../../lib/confetti";
 import { chooseWord, react as sendReaction } from "../../lib/net";
@@ -137,6 +137,7 @@ function Overlay({ room, you, choices, isDrawer }: { room: RoomState; you: strin
                   <button type="button" className={`pick sketch${i % 2 ? " sketch-alt" : ""}`} onClick={() => void chooseWord(i)}>
                     <span className="pick-cat">{categoryName(c.categoryId, lang)}</span>
                     <span className="pick-word">{c.word}</span>
+                    {c.difficulty && <Level level={c.difficulty} />}
                   </button>
                 </li>
               ))}
@@ -173,6 +174,7 @@ function Overlay({ room, you, choices, isDrawer }: { room: RoomState; you: strin
             <>
               <p className="reveal-label">The word was</p>
               <p className="reveal-word">{room.revealWord}</p>
+              {room.revealDifficulty && <p className="reveal-level">{LEVEL_NOTE[room.revealDifficulty]}</p>}
             </>
           ) : (
             <p className="reveal-label">This turn is skipped</p>
@@ -203,6 +205,25 @@ function Overlay({ room, you, choices, isDrawer }: { room: RoomState; you: strin
     );
   }
   return null;
+}
+
+const LEVEL_NAME: Record<Difficulty, string> = { easy: "Easy", medium: "Medium", hard: "Hard" };
+const LEVEL_NOTE: Record<Difficulty, string> = { easy: "Easy word", medium: "Medium word, 1.25× points", hard: "Hard word, 1.5× points" };
+const LEVEL_MARKS: Record<Difficulty, number> = { easy: 1, medium: 2, hard: 3 };
+
+/** A quiet label with one to three pencil marks. */
+function Level({ level }: { level: Difficulty }) {
+  return (
+    <span className={`pick-level is-${level}`}>
+      <svg viewBox="0 0 22 12" width="22" height="12" aria-hidden="true" focusable="false">
+        {[0, 1, 2].map((i) => (
+          <path key={i} d={`M${3 + i * 7} 10L${7 + i * 7} 2`} className={i < LEVEL_MARKS[level] ? "is-on" : undefined} />
+        ))}
+      </svg>
+      {LEVEL_NAME[level]}
+      {level !== "easy" && <span className="pick-bonus">{level === "hard" ? "1.5×" : "1.25×"}</span>}
+    </span>
+  );
 }
 
 function Reactions({ room }: { room: RoomState }) {

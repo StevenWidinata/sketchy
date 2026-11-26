@@ -3,6 +3,7 @@ import {
   checkGuess,
   cleanCustomWords,
   cleanText,
+  difficultyBonus,
   drawerPoints,
   guessPoints,
   hintCount,
@@ -10,7 +11,7 @@ import {
   normalize,
   revealPattern,
 } from "../../server/src/game/rules";
-import { buildPool, pickChoices } from "../../server/src/game/wordPool";
+import { buildPool, choicePlan, pickChoices } from "../../server/src/game/wordPool";
 import { DEFAULT_SETTINGS } from "../../shared/constants";
 import { CATEGORIES } from "../../shared/words";
 import type { Settings } from "../../shared/types";
@@ -112,6 +113,39 @@ describe("word pool", () => {
     const id = CATEGORIES.flatMap((c) => c.words.map((w) => w[1]));
     expect(en.filter((w, i) => en.indexOf(w) !== i)).toEqual([]);
     expect(id.filter((w, i) => id.indexOf(w) !== i)).toEqual([]);
+  });
+
+  it("labels every word easy, medium or hard, with some of each in every everyday category", () => {
+    for (const c of CATEGORIES) {
+      const levels = c.words.map((w) => w[2]);
+      expect(levels.every((l) => l === "easy" || l === "medium" || l === "hard"), c.id).toBe(true);
+      if (!c.hard) for (const l of ["easy", "medium", "hard"]) expect(levels, `${c.id} ${l}`).toContain(l);
+    }
+  });
+
+  it("offers one word of each difficulty, easiest first", () => {
+    expect(choicePlan(2)).toEqual(["easy", "hard"]);
+    expect(choicePlan(3)).toEqual(["easy", "medium", "hard"]);
+    expect(choicePlan(4)).toEqual(["easy", "medium", "medium", "hard"]);
+    const picks = pickChoices(settings(), 3, []);
+    expect(picks.map((w) => w.difficulty)).toEqual(["easy", "medium", "hard"]);
+  });
+
+  it("fills in from the closest level when one runs out", () => {
+    // Superheroes has a single easy word.
+    const s = settings({ categories: ["heroes"] });
+    const first = pickChoices(s, 3, []);
+    expect(first[0].word).toBe("superhero");
+    const second = pickChoices(s, 3, first.map((w) => w.key));
+    expect(second.map((w) => w.difficulty)).toEqual(["medium", "medium", "hard"]);
+    expect(second.some((w) => first.some((f) => f.key === w.key))).toBe(false);
+  });
+
+  it("scores harder words higher", () => {
+    expect(difficultyBonus("easy")).toBe(1);
+    expect(difficultyBonus("medium")).toBe(1.25);
+    expect(difficultyBonus("hard")).toBe(1.5);
+    expect(difficultyBonus(undefined)).toBe(1.25);
   });
 
   it("filters by category and language", () => {

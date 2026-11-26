@@ -1,5 +1,10 @@
 export type Language = "en" | "id";
 
+export type Difficulty = "easy" | "medium" | "hard";
+
+/** Classic turns use the host's draw time; a Speed round is 30 s a turn with earlier hints. */
+export type GameMode = "classic" | "speed";
+
 export type Phase = "lobby" | "choosing" | "drawing" | "reveal" | "podium";
 
 export interface Settings {
@@ -12,6 +17,7 @@ export interface Settings {
   categories: string[];
   customWords: string[];
   customOnly: boolean;
+  mode: GameMode;
 }
 
 export interface PublicPlayer {
@@ -54,6 +60,8 @@ export interface RoomState {
   hint: WordHint | null;
   /** The answer, only during reveal. */
   revealWord: string | null;
+  /** How hard the revealed word was, only during reveal. */
+  revealDifficulty: Difficulty | null;
   reactions: { likes: number; dislikes: number };
   /** Why the last turn ended; shown on the reveal card. */
   endReason: "all-guessed" | "time-up" | "drawer-left" | null;
@@ -62,6 +70,8 @@ export interface RoomState {
 export interface WordChoice {
   word: string;
   categoryId: string;
+  /** Missing for custom words, which play as medium without a label. */
+  difficulty?: Difficulty;
 }
 
 export type Tool = "pen" | "eraser";
